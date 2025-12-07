@@ -1,0 +1,90 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div ng-init="loadDashboard()">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Products -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Products</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalProducts}}</h3>
+                </div>
+                <div class="bg-blue-100 rounded-full p-4">
+                    <i class="fas fa-box text-blue-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Categories -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Categories</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalCategories}}</h3>
+                </div>
+                <div class="bg-green-100 rounded-full p-4">
+                    <i class="fas fa-folder text-green-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Orders</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalOrders}}</h3>
+                </div>
+                <div class="bg-yellow-100 rounded-full p-4">
+                    <i class="fas fa-shopping-cart text-yellow-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Revenue</p>
+                    <h3 class="text-3xl font-bold text-gray-800">₱{{dashboardStats.totalRevenue | number:2}}</h3>
+                </div>
+                <div class="bg-purple-100 rounded-full p-4">
+                    <i class="fas fa-dollar-sign text-purple-500 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Sales Chart -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Sales Trend</h3>
+            <canvas id="salesChart"></canvas>
+        </div>
+
+        <!-- Products by Category Chart -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Products by Category</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Order Status Chart -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Order Status Distribution</h3>
+        <div class="max-w-md mx-auto">
+            <canvas id="orderStatusChart"></canvas>
+        </div>
+    </div>
+
+</div>

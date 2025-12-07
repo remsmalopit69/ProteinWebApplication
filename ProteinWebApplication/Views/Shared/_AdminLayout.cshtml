@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Protein Admin</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" class="bg-gray-100">
+
+    <!-- Sidebar -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-8">Protein Admin</h1>
+                <nav>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="/Admin/Dashboard" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-chart-line mr-3"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Categories" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-folder mr-3"></i>
+                                Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Products" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-box mr-3"></i>
+                                Products
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Images" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-image mr-3"></i>
+                                Images
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Orders" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-shopping-cart mr-3"></i>
+                                Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Admin/Reports" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-file-pdf mr-3"></i>
+                                Reports
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" ng-click="logout()" class="flex items-center p-3 rounded hover:bg-gray-700 transition">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-md p-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">@ViewBag.Title</h2>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Welcome, Admin</span>
+                        <button ng-click="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 overflow-y-auto p-6">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/HolyScripts/Module.js"></script>
+    <script src="~/Scripts/HolyScripts/AdminService.js"></script>
+    <script src="~/Scripts/HolyScripts/AdminController.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProteinWebApplication", "ProteinWebApplication\ProteinWebApplication.csproj", "{010B4F96-3A70-4794-99F0-C5219B87A047}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{010B4F96-3A70-4794-99F0-C5219B87A047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{010B4F96-3A70-4794-99F0-C5219B87A047}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{010B4F96-3A70-4794-99F0-C5219B87A047}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{010B4F96-3A70-4794-99F0-C5219B87A047}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C9D71DB-D430-4795-BD6C-12D11FDF86C6}
+	EndGlobalSection
+EndGlobal
