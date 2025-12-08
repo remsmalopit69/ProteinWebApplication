@@ -16,7 +16,6 @@ namespace ProteinWebApplication.Models.Context
         public ProteinContext() : base("name=protein_db") { }
 
         // DbSets for all tables
-        public virtual DbSet<tblAdminUsersModel> tbl_admin_users { get; set; }
         public virtual DbSet<tblUsersModel> tbl_users { get; set; }
         public virtual DbSet<tblCategoriesModel> tbl_categories { get; set; }
         public virtual DbSet<tblProductsModel> tbl_products { get; set; }
@@ -30,7 +29,7 @@ namespace ProteinWebApplication.Models.Context
             base.OnModelCreating(modelBuilder);
 
             // Add all table mappings
-            modelBuilder.Configurations.Add(new tblAdminUsersMap());
+           
             modelBuilder.Configurations.Add(new tblUsersMap());
             modelBuilder.Configurations.Add(new tblCategoriesMap());
             modelBuilder.Configurations.Add(new tblProductsMap());

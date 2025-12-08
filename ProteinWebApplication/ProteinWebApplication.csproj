@@ -151,7 +151,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Map\tblAdminUsersMap.cs" />
     <Compile Include="Models\Map\tblAnalyticsMap.cs" />
     <Compile Include="Models\Map\tblCategoriesMap.cs" />
     <Compile Include="Models\Map\tblImagesMap.cs" />
@@ -160,7 +159,6 @@
     <Compile Include="Models\Map\tblProductsMap.cs" />
     <Compile Include="Models\Context\ProteinContext.cs" />
     <Compile Include="Models\Map\tblUsersMap.cs" />
-    <Compile Include="Models\tblAdminUsersModel.cs" />
     <Compile Include="Models\tblAnalyticsModel.cs" />
     <Compile Include="Models\tblCategoriesModel.cs" />
     <Compile Include="Models\tblImagesModel.cs" />
@@ -1012,7 +1010,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\version.json" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
-    <Content Include="Views\Admin\Login.cshtml" />
     <Content Include="Views\Admin\Dashboard.cshtml" />
     <Content Include="Views\Admin\Categories.cshtml" />
     <Content Include="Views\Admin\Products.cshtml" />

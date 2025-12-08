@@ -1,6 +1,5 @@
 ﻿using ProteinWebApplication.Models;
 using ProteinWebApplication.Models.Context;
-
 using System;
 using System.IO;
 using System.Linq;
@@ -11,80 +10,73 @@ namespace ProteinWebApplication.Controllers
 {
     public class AdminController : Controller
     {
-        // ==================== VIEWS ====================
-        public ActionResult Login()
+        // ==================== AUTHORIZATION CHECK ====================
+        private bool IsAdmin()
         {
-            return View();
+            return Session["UserRole"]?.ToString() == "admin";
         }
 
+        private ActionResult CheckAdminAccess()
+        {
+            if (Session["UserID"] == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            if (!IsAdmin())
+            {
+                return RedirectToAction("Index", "Shop");
+            }
+            return null;
+        }
+
+        // ==================== VIEWS ====================
         public ActionResult Dashboard()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
         }
 
         public ActionResult Categories()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
         }
 
         public ActionResult Products()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
         }
 
         public ActionResult Images()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
         }
 
         public ActionResult Orders()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
         }
 
         public ActionResult Reports()
         {
+            var authCheck = CheckAdminAccess();
+            if (authCheck != null) return authCheck;
             return View();
-        }
-
-        // ==================== AUTHENTICATION ====================
-        public JsonResult LoginAdmin(string username, string password)
-        {
-            try
-            {
-                using (var db = new ProteinContext())
-                {
-                    var admin = db.tbl_admin_users
-                        .Where(x => x.username == username && x.password == password && x.isArchive == 0)
-                        .FirstOrDefault();
-
-                    if (admin != null)
-                    {
-                        Session["AdminID"] = admin.adminID;
-                        Session["AdminName"] = admin.fullName;
-                        return Json(new { success = true, message = "Login successful" }, JsonRequestBehavior.AllowGet);
-                    }
-                    else
-                    {
-                        return Json(new { success = false, message = "Invalid credentials" }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Error: {ex.Message}" }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        public JsonResult LogoutAdmin()
-        {
-            Session.Clear();
-            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
         // ==================== CATEGORIES CRUD ====================
         public JsonResult GetCategories()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -104,6 +96,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult AddCategory(tblCategoriesModel category)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -126,6 +120,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult UpdateCategory(tblCategoriesModel category)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -156,6 +152,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult ArchiveCategory(int categoryID)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -184,6 +182,8 @@ namespace ProteinWebApplication.Controllers
         // ==================== PRODUCTS CRUD ====================
         public JsonResult GetProducts()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -203,6 +203,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult AddProduct(tblProductsModel product)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -225,6 +227,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult UpdateProduct(tblProductsModel product)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -258,6 +262,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult ArchiveProduct(int productID)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -286,6 +292,8 @@ namespace ProteinWebApplication.Controllers
         // ==================== IMAGES CRUD ====================
         public JsonResult GetImages()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -306,6 +314,8 @@ namespace ProteinWebApplication.Controllers
         [HttpPost]
         public JsonResult UploadImage(HttpPostedFileBase imageFile, string imageType, int? referenceID, int displayOrder)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 if (imageFile != null && imageFile.ContentLength > 0)
@@ -352,6 +362,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult ArchiveImage(int imageID)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -380,6 +392,8 @@ namespace ProteinWebApplication.Controllers
         // ==================== ORDERS CRUD ====================
         public JsonResult GetOrders()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -399,6 +413,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult UpdateOrderStatus(int orderID, string orderStatus)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -427,6 +443,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult ArchiveOrder(int orderID)
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -455,6 +473,8 @@ namespace ProteinWebApplication.Controllers
         // ==================== DASHBOARD ANALYTICS ====================
         public JsonResult GetDashboardStats()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -483,6 +503,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult GetSalesChartData()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -509,6 +531,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult GetProductsByCategoryData()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
@@ -533,6 +557,8 @@ namespace ProteinWebApplication.Controllers
 
         public JsonResult GetOrderStatusData()
         {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
             try
             {
                 using (var db = new ProteinContext())
