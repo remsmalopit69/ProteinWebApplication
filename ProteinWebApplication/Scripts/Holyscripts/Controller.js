@@ -472,4 +472,71 @@
             }
         });
     }
+    // ==================== INITIALIZATION ====================
+    $scope.products = [];
+    $scope.categories = [];
+    $scope.banners = [];
+    $scope.selectedCategory = null;
+    $scope.mobileMenuOpen = false;
+    $scope.cart = [];
+
+    // ==================== MOBILE MENU ====================
+    $scope.toggleMobileMenu = function () {
+        $scope.mobileMenuOpen = !$scope.mobileMenuOpen;
+    }
+
+    // ==================== LOAD DATA ====================
+    $scope.loadProducts = function () {
+        var getProducts = ProteinWebApplicationService.getAllProducts();
+        getProducts.then(function (response) {
+            $scope.products = response.data;
+        });
+    }
+
+    $scope.loadCategories = function () {
+        var getCategories = ProteinWebApplicationService.getAllCategories();
+        getCategories.then(function (response) {
+            $scope.categories = response.data;
+        });
+    }
+
+    $scope.loadBanners = function () {
+        var getBanners = ProteinWebApplicationService.getBannerImages();
+        getBanners.then(function (response) {
+            $scope.banners = response.data;
+        });
+    }
+
+    $scope.loadProductsByCategory = function (categoryID) {
+        $scope.selectedCategory = categoryID;
+        var getProducts = ProteinWebApplicationService.getProductsByCategory(categoryID);
+        getProducts.then(function (response) {
+            $scope.products = response.data;
+        });
+    }
+
+    $scope.loadProductDetails = function (productID) {
+        var getProduct = ProteinWebApplicationService.getProductDetails(productID);
+        getProduct.then(function (response) {
+            $scope.productDetails = response.data;
+        });
+    }
+
+    // ==================== PRODUCT ACTIONS ====================
+    $scope.viewProduct = function (productID) {
+        window.location.href = "/Shop/ProductDetails?id=" + productID;
+    }
+
+    $scope.addToCart = function (product) {
+        $scope.cart.push(product);
+        alert('Product added to cart!');
+    }
+
+    $scope.filterByCategory = function (categoryID) {
+        if (categoryID === null) {
+            $scope.loadProducts();
+        } else {
+            $scope.loadProductsByCategory(categoryID);
+        }
+    }
 });

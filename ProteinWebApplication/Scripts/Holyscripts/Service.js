@@ -144,4 +144,38 @@
     this.getOrderStatusData = function () {
         return $http.get("/Admin/GetOrderStatusData");
     }
+
+    this.getAllProducts = function () {
+        return $http.get("/Shop/GetAllProducts");
+    }
+
+    this.getAllCategories = function () {
+        return $http.get("/Shop/GetAllCategories");
+    }
+
+    this.getProductsByCategory = function (categoryID) {
+        var response = $http({
+            method: "get",
+            url: "/Shop/GetProductsByCategory",
+            params: {
+                categoryID: categoryID
+            }
+        });
+        return response;
+    }
+
+    this.getProductDetails = function (productID) {
+        var response = $http({
+            method: "get",
+            url: "/Shop/GetProductDetails",
+            params: {
+                productID: productID
+            }
+        });
+        return response;
+    }
+
+    this.getBannerImages = function () {
+        return $http.get("/Shop/GetBannerImages");
+    }
 });
