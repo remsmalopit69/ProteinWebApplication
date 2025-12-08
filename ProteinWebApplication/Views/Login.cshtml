@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Protein Admin</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Protein Admin</h1>
+            <p class="text-gray-600">Login to your account</p>
+        </div>
+
+        <form ng-submit="login()" class="space-y-6">
+            <div>
+                <label class="block text-gray-700 font-medium mb-2">Username</label>
+                <input type="text"
+                       ng-model="loginData.username"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Enter your username"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-2">Password</label>
+                <input type="password"
+                       ng-model="loginData.password"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-300">
+                Login
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-600">
+            <p>Default credentials: admin / admin123</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/HolyScripts/Module.js"></script>
+    <script src="~/Scripts/HolyScripts/Service.js"></script>
+    <script src="~/Scripts/HolyScripts/Controller.js"></script>
+</body>
+</html>
