@@ -144,6 +144,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ShopController.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Models\Map\tblOrdersMap.cs" />
     <Compile Include="Models\Map\tblProductsMap.cs" />
     <Compile Include="Models\Context\ProteinContext.cs" />
+    <Compile Include="Models\Map\tblUsersMap.cs" />
     <Compile Include="Models\tblAdminUsersModel.cs" />
     <Compile Include="Models\tblAnalyticsModel.cs" />
     <Compile Include="Models\tblCategoriesModel.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="Models\tblOrderItemsModel.cs" />
     <Compile Include="Models\tblOrdersModel.cs" />
     <Compile Include="Models\tblProductsModel.cs" />
+    <Compile Include="Models\tblUsersModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1022,6 +1025,8 @@
     <Content Include="Views\Shop\Categories.cshtml" />
     <Content Include="Views\Shop\About.cshtml" />
     <Content Include="Views\Shop\ProductDetails.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

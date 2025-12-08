@@ -1,6 +1,5 @@
 ﻿app.controller("ProteinWebApplicationController", function ($scope, ProteinWebApplicationService) {
 
-
     // ==================== INITIALIZATION ====================
     $scope.currentView = 'dashboard';
     $scope.categories = [];
@@ -9,8 +8,152 @@
     $scope.orders = [];
     $scope.dashboardStats = {};
     $scope.editMode = false;
+    $scope.currentUser = null;
+    $scope.isUserLoggedIn = false;
+    $scope.showUserDropdown = false;
 
-    // ==================== AUTHENTICATION ====================
+    // ==================== USER STATE CHECK ====================
+    $scope.checkUserLogin = function () {
+        var getCurrentUser = ProteinWebApplicationService.getCurrentUser();
+        getCurrentUser.then(function (response) {
+            if (response.data.isLoggedIn) {
+                $scope.isUserLoggedIn = true;
+                $scope.currentUser = {
+                    userID: response.data.userID,
+                    userName: response.data.userName,
+                    userEmail: response.data.userEmail
+                };
+            } else {
+                $scope.isUserLoggedIn = false;
+                $scope.currentUser = null;
+            }
+        });
+    }
+
+    // ==================== DROPDOWN TOGGLE ====================
+    $scope.toggleUserDropdown = function () {
+        $scope.showUserDropdown = !$scope.showUserDropdown;
+    }
+
+    // Close dropdown when clicking outside
+    angular.element(document).on('click', function (event) {
+        var dropdown = angular.element(event.target).closest('.relative');
+        if (dropdown.length === 0 && $scope.showUserDropdown) {
+            $scope.$apply(function () {
+                $scope.showUserDropdown = false;
+            });
+        }
+    });
+
+    // ==================== USER AUTHENTICATION ====================
+    $scope.userLoginData = {};
+    $scope.userRegisterData = {};
+
+    $scope.userLogin = function () {
+        if (!$scope.userLoginData.username || !$scope.userLoginData.password) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required Fields',
+                text: 'Please enter username and password'
+            });
+            return;
+        }
+
+        var loginRequest = ProteinWebApplicationService.loginUser($scope.userLoginData.username, $scope.userLoginData.password);
+        loginRequest.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful',
+                    text: response.data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(function () {
+                    window.location.href = "/Shop/Index";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: response.data.message
+                });
+            }
+        });
+    }
+
+    $scope.userRegister = function () {
+        // Validation
+        if (!$scope.userRegisterData.fullName || !$scope.userRegisterData.username ||
+            !$scope.userRegisterData.email || !$scope.userRegisterData.password) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required Fields',
+                text: 'Please fill in all required fields'
+            });
+            return;
+        }
+
+        // Check if passwords match
+        if ($scope.userRegisterData.password !== $scope.userRegisterData.confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'Passwords do not match'
+            });
+            return;
+        }
+
+        // Check if terms are accepted
+        if (!$scope.userRegisterData.acceptTerms) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Terms Required',
+                text: 'Please accept the terms and conditions'
+            });
+            return;
+        }
+
+        var registerRequest = ProteinWebApplicationService.registerUser($scope.userRegisterData);
+        registerRequest.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registration Successful',
+                    text: response.data.message,
+                    confirmButtonText: 'Go to Login'
+                }).then(function () {
+                    window.location.href = "/Account/Login";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: response.data.message
+                });
+            }
+        });
+    }
+
+    $scope.userLogout = function () {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will be logged out',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#000000',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var logoutRequest = ProteinWebApplicationService.logoutUser();
+                logoutRequest.then(function (response) {
+                    window.location.href = "/Shop/Index";
+                });
+            }
+        });
+    }
+
+    // ==================== ADMIN AUTHENTICATION ====================
     $scope.loginData = {};
 
     $scope.login = function () {
@@ -336,25 +479,21 @@
 
     // ==================== DASHBOARD ====================
     $scope.loadDashboard = function () {
-        // Load dashboard stats
         var getStats = ProteinWebApplicationService.getDashboardStats();
         getStats.then(function (response) {
             $scope.dashboardStats = response.data;
         });
 
-        // Load Sales Chart
         var getSalesData = ProteinWebApplicationService.getSalesChartData();
         getSalesData.then(function (response) {
             $scope.renderSalesChart(response.data);
         });
 
-        // Load Products by Category Chart
         var getCategoryData = ProteinWebApplicationService.getProductsByCategoryData();
         getCategoryData.then(function (response) {
             $scope.renderCategoryChart(response.data);
         });
 
-        // Load Order Status Chart
         var getOrderData = ProteinWebApplicationService.getOrderStatusData();
         getOrderData.then(function (response) {
             $scope.renderOrderStatusChart(response.data);
@@ -472,7 +611,8 @@
             }
         });
     }
-    // ==================== INITIALIZATION ====================
+
+    // ==================== PUBLIC SHOP ====================
     $scope.products = [];
     $scope.categories = [];
     $scope.banners = [];
@@ -480,12 +620,10 @@
     $scope.mobileMenuOpen = false;
     $scope.cart = [];
 
-    // ==================== MOBILE MENU ====================
     $scope.toggleMobileMenu = function () {
         $scope.mobileMenuOpen = !$scope.mobileMenuOpen;
     }
 
-    // ==================== LOAD DATA ====================
     $scope.loadProducts = function () {
         var getProducts = ProteinWebApplicationService.getAllProducts();
         getProducts.then(function (response) {
@@ -522,14 +660,19 @@
         });
     }
 
-    // ==================== PRODUCT ACTIONS ====================
     $scope.viewProduct = function (productID) {
         window.location.href = "/Shop/ProductDetails?id=" + productID;
     }
 
     $scope.addToCart = function (product) {
         $scope.cart.push(product);
-        alert('Product added to cart!');
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Cart',
+            text: 'Product added successfully!',
+            timer: 1500,
+            showConfirmButton: false
+        });
     }
 
     $scope.filterByCategory = function (categoryID) {

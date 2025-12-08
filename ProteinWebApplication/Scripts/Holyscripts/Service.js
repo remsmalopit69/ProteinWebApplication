@@ -1,5 +1,5 @@
 ﻿app.service("ProteinWebApplicationService", function ($http) {
-    // ==================== AUTHENTICATION ====================
+    // ==================== ADMIN AUTHENTICATION ====================
     this.loginAdmin = function (username, password) {
         var response = $http({
             method: "post",
@@ -14,6 +14,36 @@
 
     this.logoutAdmin = function () {
         return $http.get("/Admin/LogoutAdmin");
+    }
+
+    // ==================== USER AUTHENTICATION ====================
+    this.registerUser = function (userData) {
+        var response = $http({
+            method: "post",
+            url: "/Account/RegisterUser",
+            data: userData
+        });
+        return response;
+    }
+
+    this.loginUser = function (username, password) {
+        var response = $http({
+            method: "post",
+            url: "/Account/LoginUser",
+            params: {
+                username: username,
+                password: password
+            }
+        });
+        return response;
+    }
+
+    this.logoutUser = function () {
+        return $http.get("/Account/LogoutUser");
+    }
+
+    this.getCurrentUser = function () {
+        return $http.get("/Account/GetCurrentUser");
     }
 
     // ==================== CATEGORIES ====================
@@ -145,6 +175,7 @@
         return $http.get("/Admin/GetOrderStatusData");
     }
 
+    // ==================== PUBLIC SHOP ====================
     this.getAllProducts = function () {
         return $http.get("/Shop/GetAllProducts");
     }

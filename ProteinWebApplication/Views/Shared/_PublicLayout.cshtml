@@ -6,16 +6,15 @@
     <title>@ViewBag.Title - ProteinPH</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom scrollbar for a cleaner look */
+
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -34,7 +33,7 @@
             }
     </style>
 </head>
-<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" class="flex flex-col min-h-screen bg-white text-gray-900">
+<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" ng-init="checkUserLogin()" class="flex flex-col min-h-screen bg-white text-gray-900">
 
     <div class="bg-gray-100 text-xs text-gray-600 py-2 border-b">
         <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-1 md:space-y-0">
@@ -65,9 +64,47 @@
                 </div>
 
                 <div class="flex items-center space-x-6 text-gray-700">
-                    <a href="/Admin/Login" class="hover:text-black transition" title="Admin Login">
-                        <i class="fas fa-user text-xl"></i>
-                    </a>
+                    <!-- User Account Dropdown -->
+                    <div class="relative" ng-if="isUserLoggedIn">
+                        <button class="hover:text-black transition flex items-center space-x-2"
+                                ng-click="toggleUserDropdown()"
+                                id="userMenuButton">
+                            <i class="fas fa-user-circle text-2xl"></i>
+                            <span class="hidden lg:inline text-sm">{{currentUser.userName}}</span>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div ng-show="showUserDropdown"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-semibold text-gray-900">{{currentUser.userName}}</p>
+                                <p class="text-xs text-gray-500">{{currentUser.userEmail}}</p>
+                            </div>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-user mr-2"></i>My Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-box mr-2"></i>My Orders
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-heart mr-2"></i>Wishlist
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <button ng-click="userLogout()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Login/Register Links (when not logged in) -->
+                    <div class="flex items-center space-x-4" ng-if="!isUserLoggedIn">
+                        <a href="/Account/Login" class="hover:text-black transition text-sm font-medium">
+                            Login
+                        </a>
+                        <a href="/Account/Register" class="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+                            Sign Up
+                        </a>
+                    </div>
 
                     <button class="relative hover:text-black transition">
                         <i class="fas fa-shopping-cart text-xl"></i>
@@ -92,6 +129,23 @@
                     <a href="/Shop/Categories" class="text-gray-600 hover:text-black font-medium">Categories</a>
                     <a href="/Shop/About" class="text-gray-600 hover:text-black font-medium">About</a>
                     <a href="/Home/Contact" class="text-gray-600 hover:text-black font-medium">Contact</a>
+
+                    <!-- Mobile User Menu -->
+                    <div class="border-t border-gray-200 pt-3 mt-3" ng-if="isUserLoggedIn">
+                        <p class="text-sm font-semibold text-gray-900 mb-2">{{currentUser.userName}}</p>
+                        <a href="#" class="block py-2 text-gray-600 hover:text-black">My Profile</a>
+                        <a href="#" class="block py-2 text-gray-600 hover:text-black">My Orders</a>
+                        <button ng-click="userLogout()" class="block py-2 text-red-600 hover:text-red-800 text-left w-full">Logout</button>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-3 mt-3 space-y-2" ng-if="!isUserLoggedIn">
+                        <a href="/Account/Login" class="block bg-gray-100 text-gray-900 px-4 py-3 rounded-lg text-center font-medium hover:bg-gray-200">
+                            Login
+                        </a>
+                        <a href="/Account/Register" class="block bg-black text-white px-4 py-3 rounded-lg text-center font-medium hover:bg-gray-800">
+                            Sign Up
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,9 +175,9 @@
                     <ul class="space-y-3 text-sm text-gray-400">
                         <li><a href="/Shop/Index" class="hover:text-white transition">Home</a></li>
                         <li><a href="/Shop/Products" class="hover:text-white transition">All Products</a></li>
-                        <li><a href="#" class="hover:text-white transition">Whey Protein</a></li>
-                        <li><a href="#" class="hover:text-white transition">Mass Gainers</a></li>
-                        <li><a href="#" class="hover:text-white transition">Plant-Based</a></li>
+                        <li><a href="/Shop/Categories" class="hover:text-white transition">Categories</a></li>
+                        <li><a href="/Shop/About" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="/Home/Contact" class="hover:text-white transition">Contact</a></li>
                     </ul>
                 </div>
 
@@ -152,12 +206,6 @@
                         <li class="flex items-start">
                             <i class="fas fa-map-marker-alt mt-1 mr-3 text-gray-500"></i>
                             <span>Metro Manila, Philippines</span>
-                        </li>
-                        <li class="mt-4">
-                            <p class="text-white font-medium mb-1">Business Hours</p>
-                            <p class="text-xs">Mon-Fri: 9:00 AM - 6:00 PM</p>
-                            <p class="text-xs">Sat: 9:00 AM - 5:00 PM</p>
-                            <p class="text-xs">Sun: Closed</p>
                         </li>
                     </ul>
                 </div>
