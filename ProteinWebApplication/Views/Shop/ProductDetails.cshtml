@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "Product Details";
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+}
+
+<div ng-init="loadProductDetails(@ViewBag.ProductID)">
+
+    <!-- Product Details Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <!-- Back Button -->
+            <a href="/Shop/Products" class="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Products
+            </a>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Product Images -->
+                <div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden mb-4">
+                        <img ng-src="{{productDetails.images[0].imagePath || 'https://via.placeholder.com/600x600?text=No+Image'}}"
+                             alt="{{productDetails.productName}}"
+                             class="w-full h-96 object-cover">
+                    </div>
+
+                    <!-- Thumbnail Images -->
+                    <div class="grid grid-cols-4 gap-2" ng-if="productDetails.images.length > 1">
+                        <div ng-repeat="img in productDetails.images" class="bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-75 transition">
+                            <img ng-src="{{img.imagePath}}"
+                                 alt="{{img.imageName}}"
+                                 class="w-full h-20 object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div>
+                    <!-- Category Badge -->
+                    <span class="inline-block bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-semibold mb-4">
+                        {{productDetails.categoryName}}
+                    </span>
+
+                    <!-- Product Name -->
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4">{{productDetails.productName}}</h1>
+
+                    <!-- Price -->
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-blue-600">₱{{productDetails.price | number:2}}</span>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-6">
+                        <span ng-if="productDetails.stockQuantity > 0" class="inline-flex items-center text-green-600 font-semibold">
+                            <i class="fas fa-check-circle mr-2"></i>In Stock ({{productDetails.stockQuantity}} available)
+                        </span>
+                        <span ng-if="productDetails.stockQuantity === 0" class="inline-flex items-center text-red-600 font-semibold">
+                            <i class="fas fa-times-circle mr-2"></i>Out of Stock
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Product Description</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            {{productDetails.productDescription || 'High-quality protein supplement designed to support your fitness goals. Perfect for muscle building, recovery, and overall health.'}}
+                        </p>
+                    </div>
+
+                    <!-- Quantity Selector -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Quantity</h3>
+                        <div class="flex items-center space-x-4">
+                            <button class="bg-gray-200 text-gray-800 w-10 h-10 rounded-lg hover:bg-gray-300 transition font-bold">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" value="1" min="1" max="{{productDetails.stockQuantity}}"
+                                   class="w-20 text-center border-2 border-gray-300 rounded-lg py-2 font-semibold">
+                            <button class="bg-gray-200 text-gray-800 w-10 h-10 rounded-lg hover:bg-gray-300 transition font-bold">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <div class="flex gap-4">
+                        <button ng-disabled="productDetails.stockQuantity === 0"
+                                class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                        </button>
+                        <button class="bg-gray-200 text-gray-800 px-6 py-4 rounded-lg hover:bg-gray-300 transition">
+                            <i class="fas fa-heart text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Product Features -->
+                    <div class="mt-8 border-t pt-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Key Features</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Lab-tested for quality and purity</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">100% authentic and genuine products</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Fast and reliable delivery</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Secure payment options</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="py-16 bg-gray-50" ng-init="loadProducts()">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Related Products</h2>
+                <p class="text-gray-600">You might also like these products</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div ng-repeat="product in products | limitTo:4" class="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden">
+                    <div class="relative">
+                        <img ng-src="{{product.image || 'https://via.placeholder.com/300x300?text=No+Image'}}"
+                             alt="{{product.productName}}"
+                             class="w-full h-64 object-cover">
+                        <span ng-if="product.stockQuantity > 0" class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            In Stock
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-blue-600 text-sm font-semibold">{{product.categoryName}}</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 mt-1">{{product.productName}}</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-2xl font-bold text-blue-600">₱{{product.price | number:2}}</span>
+                            <button ng-click="viewProduct(product.productID)" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>

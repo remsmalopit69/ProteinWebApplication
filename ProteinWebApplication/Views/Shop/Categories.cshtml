@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Categories";
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+}
+
+<div ng-init="loadCategories();">
+
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Browse Categories</h1>
+            <p class="text-xl text-blue-100">Find the perfect supplement category for your fitness goals</p>
+        </div>
+    </section>
+
+    <!-- Categories Grid -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div ng-repeat="category in categories"
+                     class="bg-white rounded-lg shadow-md hover:shadow-2xl transition duration-300 overflow-hidden group cursor-pointer"
+                     ng-click="filterByCategory(category.categoryID)">
+
+                    <!-- Category Image/Icon -->
+                    <div class="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                        <img ng-if="category.image"
+                             ng-src="{{category.image}}"
+                             alt="{{category.categoryName}}"
+                             class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                        <div ng-if="!category.image" class="text-white">
+                            <i class="fas fa-box text-8xl opacity-30"></i>
+                        </div>
+
+                        <!-- Product Count Badge -->
+                        <div class="absolute top-4 right-4 bg-white text-blue-600 px-4 py-2 rounded-full font-bold shadow-lg">
+                            {{category.productCount}} Products
+                        </div>
+                    </div>
+
+                    <!-- Category Info -->
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition">
+                            {{category.categoryName}}
+                        </h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            {{category.categoryDescription || 'Explore our selection of ' + category.categoryName + ' products.'}}
+                        </p>
+
+                        <!-- Browse Button -->
+                        <a href="/Shop/Products"
+                           ng-click="filterByCategory(category.categoryID)"
+                           class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 transition">
+                            Browse Products
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Categories Message -->
+            <div ng-if="categories.length === 0" class="text-center py-16">
+                <i class="fas fa-folder-open text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-2xl font-bold text-gray-600 mb-2">No Categories Available</h3>
+                <p class="text-gray-500">Check back soon for new categories</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Products Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Popular Products</h2>
+                <p class="text-gray-600">Best-selling items across all categories</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" ng-init="loadProducts()">
+                <div ng-repeat="product in products | limitTo:4" class="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden">
+                    <div class="relative">
+                        <img ng-src="{{product.image || 'https://via.placeholder.com/300x300?text=No+Image'}}"
+                             alt="{{product.productName}}"
+                             class="w-full h-64 object-cover">
+                        <span ng-if="product.stockQuantity > 0" class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            In Stock
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-blue-600 text-sm font-semibold">{{product.categoryName}}</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 mt-1">{{product.productName}}</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-2xl font-bold text-blue-600">₱{{product.price | number:2}}</span>
+                            <button ng-click="viewProduct(product.productID)" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="/Shop/Products" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    View All Products <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<style>
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
