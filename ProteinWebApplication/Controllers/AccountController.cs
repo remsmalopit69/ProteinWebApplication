@@ -89,7 +89,8 @@ namespace ProteinWebApplication.Controllers
                         Session["UserID"] = user.userID;
                         Session["UserName"] = user.fullName;
                         Session["UserEmail"] = user.email;
-                        return Json(new { success = true, message = "Login successful" }, JsonRequestBehavior.AllowGet);
+                        Session["UserRole"] = user.role; // Optional: Save role to session if needed later
+                        return Json(new { success = true, message = "Login successful", role =  user.role }, JsonRequestBehavior.AllowGet);
                     }
                     else
                     {

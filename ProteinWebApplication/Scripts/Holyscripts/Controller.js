@@ -69,8 +69,11 @@
                     timer: 1500,
                     showConfirmButton: false
                 }).then(function () {
-                    window.location.href = "/Shop/Index";
-                });
+                    if (response.data.role === 'admin') {
+                        window.location.href = "/Admin/Dashboard";
+                    } else {
+                        window.location.href = "/Shop/Index";
+                    }                });
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -201,7 +204,7 @@
             if (result.isConfirmed) {
                 var logoutRequest = ProteinWebApplicationService.logoutAdmin();
                 logoutRequest.then(function (response) {
-                    window.location.href = "/Admin/Login";
+                    window.location.href = "/Account/Login";
                 });
             }
         });

@@ -29,6 +29,13 @@ namespace ProteinWebApplication.Controllers
             return null;
         }
 
+        public JsonResult LogoutAdmin()
+        {
+            Session.Clear();
+            // AllowGet is required because Service.js uses $http.get()
+            return Json(new { success = true, message = "Logged out successfully" }, JsonRequestBehavior.AllowGet);
+        }
+
         // ==================== VIEWS ====================
         public ActionResult Dashboard()
         {
