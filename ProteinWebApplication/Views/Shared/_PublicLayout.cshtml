@@ -3,143 +3,172 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Protein Shop</title>
+    <title>@ViewBag.Title - ProteinPH</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
     </style>
 </head>
-<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" class="bg-gray-50">
+<body ng-app="ProteinWebApplication" ng-controller="ProteinWebApplicationController" class="flex flex-col min-h-screen bg-white text-gray-900">
 
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="bg-gray-100 text-xs text-gray-600 py-2 border-b">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-1 md:space-y-0">
+            <p>Free shipping on orders over &#8369;2,000 nationwide</p>
+            <p>Based in Philippines | Contact: 0917-XXX-XXXX</p>
+        </div>
+    </div>
+
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <!-- Logo -->
-                <a href="/Shop/Index" class="text-2xl font-bold text-blue-600">
-                    <i class="fas fa-dumbbell mr-2"></i>PROTEIN SHOP
+            <div class="flex flex-wrap justify-between items-center py-4">
+
+                <a href="/Shop/Index" class="text-2xl font-bold tracking-tight text-black flex-shrink-0 mr-8">
+                    ProteinPH
                 </a>
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="/Shop/Index" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Home
-                    </a>
-                    <a href="/Shop/Products" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Products
-                    </a>
-                    <a href="/Shop/Categories" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Categories
-                    </a>
-                    <a href="/Shop/About" class="text-gray-700 hover:text-blue-600 font-medium transition">
-                        About
-                    </a>
+                <div class="hidden lg:flex space-x-8 font-medium text-sm text-gray-600">
+                    <a href="/Shop/Index" class="hover:text-black transition">Home</a>
+                    <a href="/Shop/Products" class="hover:text-black transition">Products</a>
+                    <a href="/Shop/Categories" class="hover:text-black transition">Categories</a>
+                    <a href="/Shop/About" class="hover:text-black transition">About</a>
+                    <a href="/Home/Contact" class="hover:text-black transition">Contact</a>
                 </div>
 
-                <!-- Cart & Admin -->
-                <div class="flex items-center space-x-4">
-                    <button class="relative text-gray-700 hover:text-blue-600 transition">
-                        <i class="fas fa-shopping-cart text-2xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
-                    </button>
-                    <a href="/Admin/Login" class="hidden md:block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-user-shield mr-2"></i>Admin
+                <div class="hidden md:flex flex-grow max-w-md mx-8 relative">
+                    <input type="text" placeholder="Search products..." class="w-full bg-gray-100 border-none rounded-full py-2 px-4 pl-10 text-sm focus:ring-2 focus:ring-black focus:bg-white transition" />
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+
+                <div class="flex items-center space-x-6 text-gray-700">
+                    <a href="/Admin/Login" class="hover:text-black transition" title="Admin Login">
+                        <i class="fas fa-user text-xl"></i>
                     </a>
 
-                    <!-- Mobile Menu Button -->
-                    <button ng-click="toggleMobileMenu()" class="md:hidden text-gray-700">
-                        <i class="fas fa-bars text-2xl"></i>
+                    <button class="relative hover:text-black transition">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+                    </button>
+
+                    <button ng-click="toggleMobileMenu()" class="lg:hidden text-gray-700 hover:text-black">
+                        <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Mobile Navigation -->
-            <div ng-show="mobileMenuOpen" class="md:hidden pb-4 border-t">
-                <div class="flex flex-col space-y-3 mt-3">
-                    <a href="/Shop/Index" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
-                    <a href="/Shop/Products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
-                    <a href="/Shop/Categories" class="text-gray-700 hover:text-blue-600 font-medium">Categories</a>
-                    <a href="/Shop/About" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
-                    <a href="/Admin/Login" class="text-blue-600 font-medium">
-                        <i class="fas fa-user-shield mr-2"></i>Admin
-                    </a>
+            <div ng-show="mobileMenuOpen" class="lg:hidden pb-4 border-t border-gray-100 animate-fade-in-down" style="display: none;">
+                <div class="mt-4 mb-4 relative">
+                    <input type="text" placeholder="Search products..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-4 pl-10 text-sm" />
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+
+                <div class="flex flex-col space-y-3">
+                    <a href="/Shop/Index" class="text-gray-600 hover:text-black font-medium">Home</a>
+                    <a href="/Shop/Products" class="text-gray-600 hover:text-black font-medium">Products</a>
+                    <a href="/Shop/Categories" class="text-gray-600 hover:text-black font-medium">Categories</a>
+                    <a href="/Shop/About" class="text-gray-600 hover:text-black font-medium">About</a>
+                    <a href="/Home/Contact" class="text-gray-600 hover:text-black font-medium">Contact</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main>
+    <main class="flex-grow">
         @RenderBody()
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
-        <div class="container mx-auto px-4 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- About -->
+    <footer class="bg-black text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
                 <div>
-                    <h3 class="text-xl font-bold mb-4">
-                        <i class="fas fa-dumbbell mr-2"></i>PROTEIN SHOP
-                    </h3>
-                    <p class="text-gray-400">Your trusted source for premium protein supplements and fitness nutrition.</p>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="/Shop/Products" class="text-gray-400 hover:text-white transition">Products</a></li>
-                        <li><a href="/Shop/Categories" class="text-gray-400 hover:text-white transition">Categories</a></li>
-                        <li><a href="/Shop/About" class="text-gray-400 hover:text-white transition">About Us</a></li>
-                    </ul>
-                </div>
-
-                <!-- Categories -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Whey Protein</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Plant-Based</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Mass Gainers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Pre-Workout</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><i class="fas fa-envelope mr-2"></i>info@proteinshop.com</li>
-                        <li><i class="fas fa-phone mr-2"></i>+63 123 456 7890</li>
-                        <li><i class="fas fa-map-marker-alt mr-2"></i>Quezon City, Philippines</li>
-                    </ul>
-                    <div class="flex space-x-4 mt-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook text-2xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-2xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter text-2xl"></i></a>
+                    <h3 class="text-xl font-bold mb-6">ProteinPH</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Your trusted Philippines-based reseller of premium protein supplements. Quality products, competitive prices, fast delivery.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition duration-300"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition duration-300"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition duration-300"><i class="fab fa-tiktok"></i></a>
                     </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Quick Links</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="/Shop/Index" class="hover:text-white transition">Home</a></li>
+                        <li><a href="/Shop/Products" class="hover:text-white transition">All Products</a></li>
+                        <li><a href="#" class="hover:text-white transition">Whey Protein</a></li>
+                        <li><a href="#" class="hover:text-white transition">Mass Gainers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Plant-Based</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Customer Service</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="/Home/Contact" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
+                        <li><a href="#" class="hover:text-white transition">Returns & Exchanges</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Track Your Order</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Contact Information</h4>
+                    <ul class="space-y-4 text-sm text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-phone mt-1 mr-3 text-gray-500"></i>
+                            <span>0917-XXX-XXXX</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-gray-500"></i>
+                            <span>hello@proteinph.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-gray-500"></i>
+                            <span>Metro Manila, Philippines</span>
+                        </li>
+                        <li class="mt-4">
+                            <p class="text-white font-medium mb-1">Business Hours</p>
+                            <p class="text-xs">Mon-Fri: 9:00 AM - 6:00 PM</p>
+                            <p class="text-xs">Sat: 9:00 AM - 5:00 PM</p>
+                            <p class="text-xs">Sun: Closed</p>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; @DateTime.Now.Year Protein Shop. All rights reserved.</p>
+            <div class="border-t border-gray-800 pt-8 text-center text-xs text-gray-500">
+                <p>&copy; @DateTime.Now.Year ProteinPH. All rights reserved. | Trusted Philippines Protein Supplement Reseller</p>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts - USE EXISTING FILES -->
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/HolyScripts/Module.js"></script>

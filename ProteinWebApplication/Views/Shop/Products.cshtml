@@ -3,129 +3,141 @@
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
 }
 
-<div ng-init="loadProducts(); loadCategories();">
+<div ng-init="loadProducts(); loadCategories();" class="bg-white min-h-screen">
 
-    <!-- Page Header -->
-    <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+    <section class="pt-16 pb-8 border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Products</h1>
-            <p class="text-xl text-blue-100">Discover premium protein supplements for every fitness goal</p>
+            <div class="max-w-3xl">
+                <span class="text-xs font-bold tracking-widest text-gray-500 uppercase mb-2 block">Shop</span>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">All Products</h1>
+                <p class="text-gray-500 text-lg">
+                    Browse our complete collection of premium protein supplements from trusted international brands.
+                </p>
+            </div>
         </div>
     </section>
 
-    <!-- Filters & Products Grid -->
-    <section class="py-12 bg-gray-50">
+    <section class="py-12">
         <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row gap-8">
+            <div class="flex flex-col lg:flex-row gap-12">
 
-                <!-- Sidebar Filters -->
-                <aside class="w-full md:w-64 flex-shrink-0">
-                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Filter by Category</h3>
+                <aside class="w-full lg:w-64 flex-shrink-0">
+                    <div class="sticky top-24 space-y-8">
 
-                        <!-- All Products Button -->
-                        <button ng-click="filterByCategory(null)"
-                                ng-class="{'bg-blue-600 text-white': selectedCategory === null, 'bg-gray-100 text-gray-700 hover:bg-gray-200': selectedCategory !== null}"
-                                class="w-full text-left px-4 py-3 rounded-lg mb-2 transition font-medium">
-                            <i class="fas fa-th-large mr-2"></i>All Products
-                        </button>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-6 uppercase text-xs tracking-wider border-b border-gray-100 pb-2">
+                                Categories
+                            </h3>
 
-                        <!-- Category Buttons -->
-                        <button ng-repeat="category in categories"
-                                ng-click="filterByCategory(category.categoryID)"
-                                ng-class="{'bg-blue-600 text-white': selectedCategory === category.categoryID, 'bg-gray-100 text-gray-700 hover:bg-gray-200': selectedCategory !== category.categoryID}"
-                                class="w-full text-left px-4 py-3 rounded-lg mb-2 transition">
-                            <i class="fas fa-tag mr-2"></i>{{category.categoryName}}
-                            <span class="float-right text-sm opacity-75">({{category.productCount}})</span>
-                        </button>
+                            <div class="space-y-1">
+                                <button ng-click="filterByCategory(null)"
+                                        class="w-full text-left py-2 text-sm transition-all duration-200 group flex items-center justify-between"
+                                        ng-class="{'font-bold text-black': selectedCategory === null, 'text-gray-500 hover:text-black': selectedCategory !== null}">
+                                    <span>All Products</span>
+                                    <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity" ng-if="selectedCategory !== null"></i>
+                                </button>
+
+                                <button ng-repeat="category in categories"
+                                        ng-click="filterByCategory(category.categoryID)"
+                                        class="w-full text-left py-2 text-sm transition-all duration-200 group flex items-center justify-between"
+                                        ng-class="{'font-bold text-black': selectedCategory === category.categoryID, 'text-gray-500 hover:text-black': selectedCategory !== category.categoryID}">
+                                    <span>{{category.categoryName}}</span>
+                                    <span class="text-xs text-gray-400" ng-class="{'text-black font-normal': selectedCategory === category.categoryID}">
+                                        {{category.productCount}}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hidden lg:block">
+                            <i class="fas fa-shield-alt text-2xl text-gray-900 mb-3"></i>
+                            <h4 class="font-bold text-sm text-gray-900 mb-1">100% Authentic</h4>
+                            <p class="text-xs text-gray-500 leading-relaxed">
+                                We guarantee all our products are sourced directly from authorized distributors.
+                            </p>
+                        </div>
                     </div>
                 </aside>
 
-                <!-- Products Grid -->
                 <div class="flex-1">
-                    <!-- Products Count -->
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
-                            <span ng-if="selectedCategory === null">All Products</span>
-                            <span ng-if="selectedCategory !== null">{{(categories | filter:{categoryID:selectedCategory})[0].categoryName}}</span>
-                        </h2>
-                        <p class="text-gray-600">Showing {{products.length}} products</p>
+
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-100">
+                        <p class="text-sm text-gray-500 mb-4 sm:mb-0">
+                            Showing <span class="font-bold text-gray-900">{{products.length}}</span> results
+                        </p>
+                        <div class="flex items-center space-x-2 text-sm">
+                            <span class="text-gray-500">Sort by:</span>
+                            <select class="border-none bg-transparent font-bold text-gray-900 focus:ring-0 cursor-pointer pr-8">
+                                <option>Featured</option>
+                                <option>Price: Low to High</option>
+                                <option>Price: High to Low</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Products Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <div ng-repeat="product in products" class="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group">
-                            <!-- Product Image -->
-                            <div class="relative overflow-hidden">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                        <div ng-repeat="product in products" class="group">
+
+                            <div class="relative aspect-[4/5] bg-gray-50 rounded-2xl overflow-hidden mb-5">
+                                <span ng-if="product.stockQuantity === 0" class="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider rounded-full z-10">
+                                    Sold Out
+                                </span>
+                                <span ng-if="product.price < 3000 && product.stockQuantity > 0" class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider rounded-full z-10">
+                                    Sale
+                                </span>
+
                                 <img ng-src="{{product.image || 'https://via.placeholder.com/300x300?text=No+Image'}}"
                                      alt="{{product.productName}}"
-                                     class="w-full h-64 object-cover group-hover:scale-110 transition duration-300">
+                                     class="w-full h-full object-contain p-8 group-hover:scale-105 transition duration-500 mix-blend-multiply">
 
-                                <!-- Stock Badge -->
-                                <span ng-if="product.stockQuantity > 0"
-                                      class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                                    In Stock
-                                </span>
-                                <span ng-if="product.stockQuantity === 0"
-                                      class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                                    Out of Stock
-                                </span>
-
-                                <!-- Quick View Overlay -->
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition duration-300 flex items-center justify-center">
+                                <div class="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300 ease-out">
                                     <button ng-click="viewProduct(product.productID)"
-                                            class="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition duration-300">
-                                        View Details
+                                            class="w-full bg-white text-black font-bold py-3 rounded-xl shadow-lg border border-gray-100 hover:bg-black hover:text-white transition flex items-center justify-center space-x-2">
+                                        <i class="fas fa-eye text-xs"></i>
+                                        <span>View Details</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Product Info -->
-                            <div class="p-4">
-                                <span class="text-blue-600 text-xs font-semibold uppercase tracking-wide">{{product.categoryName}}</span>
-                                <h3 class="text-lg font-bold text-gray-800 mb-2 mt-1 line-clamp-1">{{product.productName}}</h3>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{product.productDescription}}</p>
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">{{product.categoryName}}</span>
 
-                                <!-- Price & Add to Cart -->
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <span class="text-2xl font-bold text-blue-600">₱{{product.price | number:2}}</span>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-star text-xs text-yellow-400"></i>
+                                        <span class="text-xs font-medium text-gray-500">4.8</span>
                                     </div>
+                                </div>
+
+                                <h3 class="text-base font-bold text-gray-900 mb-2 leading-snug group-hover:text-gray-600 transition">
+                                    <a href="#" ng-click="viewProduct(product.productID)">{{product.productName}}</a>
+                                </h3>
+
+                                <div class="flex items-center justify-between mt-3">
+                                    <span class="text-lg font-bold text-gray-900">₱{{product.price | number:2}}</span>
+
                                     <button ng-click="viewProduct(product.productID)"
-                                            ng-disabled="product.stockQuantity === 0"
-                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-semibold">
-                                        <i class="fas fa-eye mr-1"></i>View
+                                            class="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 hover:border-black transition">
+                                        Shop Now
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- No Products Message -->
-                    <div ng-if="products.length === 0" class="text-center py-16">
-                        <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
-                        <h3 class="text-2xl font-bold text-gray-600 mb-2">No Products Found</h3>
-                        <p class="text-gray-500">Try selecting a different category</p>
+                    <div ng-if="products.length === 0" class="text-center py-32 bg-gray-50 rounded-2xl mt-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white text-gray-300 mb-4 shadow-sm">
+                            <i class="fas fa-search text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">No products found</h3>
+                        <p class="text-gray-500">Try selecting a different category or clear your filters.</p>
+                        <button ng-click="filterByCategory(null)" class="mt-6 text-black font-bold underline decoration-2 underline-offset-4 hover:text-gray-600">
+                            Clear all filters
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
-
 </div>
-
-<style>
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
