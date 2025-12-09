@@ -58,6 +58,7 @@ namespace ProteinWebApplication.Controllers
                     }
 
                     // Create new user
+                    user.role = "customer"; // THIS WAS MISSING!
                     user.createdAt = DateTime.Now;
                     user.updatedAt = DateTime.Now;
                     user.isArchive = 0;

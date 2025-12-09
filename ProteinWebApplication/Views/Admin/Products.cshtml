@@ -56,73 +56,87 @@
 
     <!-- Product Modal -->
     <div class="modal fade" id="productModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">{{editMode ? 'Edit' : 'Add'}} Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form ng-submit="saveProduct()">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="row">
+                        <!-- Product Form -->
+                        <div class="col-md-6">
+                            <form ng-submit="saveProduct()">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-medium mb-2">Product Name</label>
+                                    <input type="text"
+                                           ng-model="productForm.productName"
+                                           class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-medium mb-2">Category</label>
+                                    <select ng-model="productForm.categoryID"
+                                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required>
+                                        <option value="">Select Category</option>
+                                        <option ng-repeat="cat in categories" value="{{cat.categoryID}}">{{cat.categoryName}}</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-medium mb-2">Description</label>
+                                    <textarea ng-model="productForm.productDescription"
+                                              class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              rows="3"></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 font-medium mb-2">Price</label>
+                                        <input type="number"
+                                               step="0.01"
+                                               ng-model="productForm.price"
+                                               class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 font-medium mb-2">Stock Quantity</label>
+                                        <input type="number"
+                                               ng-model="productForm.stockQuantity"
+                                               class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-2">
+                                    <button type="button"
+                                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                                            data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                        Save Product
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Image Selector -->
+                        <div class="col-md-6" ng-if="editMode">
                             <div class="mb-4">
-                                <label class="block text-gray-700 font-medium mb-2">Product Name</label>
-                                <input type="text"
-                                       ng-model="productForm.productName"
-                                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 font-medium mb-2">Category</label>
-                                <select ng-model="productForm.categoryID"
-                                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                    <option value="">Select Category</option>
-                                    <option ng-repeat="cat in categories" value="{{cat.categoryID}}">{{cat.categoryName}}</option>
-                                </select>
+                                <label class="block text-gray-700 font-medium mb-2">Select Product Image</label>
+                                <div ng-init="loadImagesByType('product')" class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+                                    <div ng-repeat="img in availableImages"
+                                         ng-click="assignProductImage(img.imageID)"
+                                         class="cursor-pointer border-2 border-gray-200 rounded-lg hover:border-blue-500 transition p-2">
+                                        <img ng-src="{{img.imagePath}}"
+                                             alt="{{img.imageName}}"
+                                             class="w-full h-32 object-cover rounded">
+                                        <p class="text-xs text-gray-600 mt-1 truncate">{{img.imageName}}</p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Click an image to assign it to this product</p>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Description</label>
-                            <textarea ng-model="productForm.productDescription"
-                                      class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      rows="3"></textarea>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="mb-4">
-                                <label class="block text-gray-700 font-medium mb-2">Price</label>
-                                <input type="number"
-                                       step="0.01"
-                                       ng-model="productForm.price"
-                                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 font-medium mb-2">Stock Quantity</label>
-                                <input type="number"
-                                       ng-model="productForm.stockQuantity"
-                                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 font-medium mb-2">Display Order</label>
-                                <input type="number"
-                                       ng-model="productForm.displayOrder"
-                                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-2">
-                            <button type="button"
-                                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-                                    data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                    data-bs-dismiss="modal">
-                                Save
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

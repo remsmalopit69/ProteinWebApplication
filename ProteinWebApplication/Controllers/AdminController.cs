@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
 namespace ProteinWebApplication.Controllers
 {
@@ -588,5 +590,265 @@ namespace ProteinWebApplication.Controllers
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public JsonResult GetImagesByType(string imageType)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var images = db.tbl_images
+                        .Where(x => x.isArchive == 0 && x.imageType == imageType)
+                        .OrderBy(x => x.displayOrder)
+                        .ToList();
+                    return Json(images, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult AssignImageToProduct(int productID, int imageID)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var image = db.tbl_images.FirstOrDefault(x => x.imageID == imageID);
+                    if (image != null)
+                    {
+                        image.referenceID = productID;
+                        image.imageType = "product";
+                        db.SaveChanges();
+                        return Json(new { success = true, message = "Image assigned successfully" }, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new { success = false, message = "Image not found" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult AssignImageToCategory(int categoryID, int imageID)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var image = db.tbl_images.FirstOrDefault(x => x.imageID == imageID);
+                    if (image != null)
+                    {
+                        image.referenceID = categoryID;
+                        image.imageType = "category";
+                        db.SaveChanges();
+                        return Json(new { success = true, message = "Image assigned successfully" }, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new { success = false, message = "Image not found" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult GenerateSalesReport()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var orders = db.tbl_orders
+                        .Where(x => x.isArchive == 0)
+                        .OrderByDescending(x => x.orderDate)
+                        .ToList();
+
+                    var doc = new Document(PageSize.A4, 25, 25, 30, 30);
+                    var ms = new MemoryStream();
+                    PdfWriter.GetInstance(doc, ms);
+                    doc.Open();
+
+                    // Header
+                    var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                    var title = new Paragraph("Sales Report - ProteinPH", titleFont);
+                    title.Alignment = Element.ALIGN_CENTER;
+                    title.SpacingAfter = 20;
+                    doc.Add(title);
+
+                    // Date
+                    var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+                    var datePara = new Paragraph($"Generated on: {DateTime.Now:MMMM dd, yyyy HH:mm}", dateFont);
+                    datePara.Alignment = Element.ALIGN_RIGHT;
+                    datePara.SpacingAfter = 20;
+                    doc.Add(datePara);
+
+                    // Summary
+                    var totalRevenue = orders.Sum(x => x.totalAmount);
+                    var totalOrders = orders.Count;
+                    var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+                    var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA, 12);
+                    doc.Add(new Paragraph($"Total Orders: {totalOrders}", summaryFont));
+                    doc.Add(new Paragraph($"Total Revenue: ₱{totalRevenue:N2}", summaryFont));
+                    doc.Add(new Paragraph($"Average Order Value: ₱{avgOrderValue:N2}", summaryFont));
+                    doc.Add(new Paragraph(" "));
+
+                    // Orders Table
+                    var table = new PdfPTable(5);
+                    table.WidthPercentage = 100;
+                    table.SetWidths(new float[] { 1, 3, 2, 2, 2 });
+                    table.SpacingBefore = 20;
+
+                    // Table Header
+                    var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+                    var headerBg = new BaseColor(240, 240, 240);
+
+                    AddCell(table, "Order ID", headerFont, headerBg);
+                    AddCell(table, "Customer", headerFont, headerBg);
+                    AddCell(table, "Date", headerFont, headerBg);
+                    AddCell(table, "Status", headerFont, headerBg);
+                    AddCell(table, "Amount", headerFont, headerBg);
+
+                    // Table Data
+                    var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                    foreach (var order in orders)
+                    {
+                        AddCell(table, order.orderID.ToString(), cellFont);
+                        AddCell(table, order.customerName, cellFont);
+                        AddCell(table, order.orderDate.ToString("MM/dd/yyyy"), cellFont);
+                        AddCell(table, order.orderStatus, cellFont);
+                        AddCell(table, $"₱{order.totalAmount:N2}", cellFont);
+                    }
+
+                    doc.Add(table);
+                    doc.Close();
+
+                    var pdfBytes = ms.ToArray();
+                    return File(pdfBytes, "application/pdf", $"SalesReport_{DateTime.Now:yyyyMMdd}.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Inventory Report
+        public ActionResult GenerateInventoryReport()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var products = db.tbl_products
+                        .Where(x => x.isArchive == 0)
+                        .OrderBy(x => x.productName)
+                        .ToList();
+
+                    var categories = db.tbl_categories
+                        .Where(x => x.isArchive == 0)
+                        .ToDictionary(c => c.categoryID, c => c.categoryName);
+
+                    var doc = new Document(PageSize.A4, 25, 25, 30, 30);
+                    var ms = new MemoryStream();
+                    PdfWriter.GetInstance(doc, ms);
+                    doc.Open();
+
+                    // Header
+                    var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                    var title = new Paragraph("Inventory Report - ProteinPH", titleFont);
+                    title.Alignment = Element.ALIGN_CENTER;
+                    title.SpacingAfter = 20;
+                    doc.Add(title);
+
+                    // Date
+                    var dateFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+                    var datePara = new Paragraph($"Generated on: {DateTime.Now:MMMM dd, yyyy HH:mm}", dateFont);
+                    datePara.Alignment = Element.ALIGN_RIGHT;
+                    datePara.SpacingAfter = 20;
+                    doc.Add(datePara);
+
+                    // Summary
+                    var totalProducts = products.Count;
+                    var totalStock = products.Sum(x => x.stockQuantity);
+                    var outOfStock = products.Count(x => x.stockQuantity == 0);
+                    var lowStock = products.Count(x => x.stockQuantity > 0 && x.stockQuantity < 10);
+
+                    var summaryFont = FontFactory.GetFont(FontFactory.HELVETICA, 12);
+                    doc.Add(new Paragraph($"Total Products: {totalProducts}", summaryFont));
+                    doc.Add(new Paragraph($"Total Stock Units: {totalStock}", summaryFont));
+                    doc.Add(new Paragraph($"Out of Stock: {outOfStock} products", summaryFont));
+                    doc.Add(new Paragraph($"Low Stock (<10): {lowStock} products", summaryFont));
+                    doc.Add(new Paragraph(" "));
+
+                    // Products Table
+                    var table = new PdfPTable(5);
+                    table.WidthPercentage = 100;
+                    table.SetWidths(new float[] { 1, 4, 2, 2, 2 });
+                    table.SpacingBefore = 20;
+
+                    // Table Header
+                    var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+                    var headerBg = new BaseColor(240, 240, 240);
+
+                    AddCell(table, "ID", headerFont, headerBg);
+                    AddCell(table, "Product Name", headerFont, headerBg);
+                    AddCell(table, "Category", headerFont, headerBg);
+                    AddCell(table, "Stock", headerFont, headerBg);
+                    AddCell(table, "Price", headerFont, headerBg);
+
+                    // Table Data
+                    var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                    foreach (var product in products)
+                    {
+                        var categoryName = categories.ContainsKey(product.categoryID) ? categories[product.categoryID] : "N/A";
+                        var stockColor = product.stockQuantity == 0 ? BaseColor.RED :
+                                        product.stockQuantity < 10 ? BaseColor.ORANGE : BaseColor.BLACK;
+
+                        AddCell(table, product.productID.ToString(), cellFont);
+                        AddCell(table, product.productName, cellFont);
+                        AddCell(table, categoryName, cellFont);
+                        AddCell(table, product.stockQuantity.ToString(), cellFont, null, stockColor);
+                        AddCell(table, $"₱{product.price:N2}", cellFont);
+                    }
+
+                    doc.Add(table);
+                    doc.Close();
+
+                    var pdfBytes = ms.ToArray();
+                    return File(pdfBytes, "application/pdf", $"InventoryReport_{DateTime.Now:yyyyMMdd}.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Helper method for adding cells
+        private void AddCell(PdfPTable table, string text, Font font, BaseColor bgColor = null, BaseColor textColor = null)
+        {
+            var cell = new PdfPCell(new Phrase(text, font));
+            if (bgColor != null) cell.BackgroundColor = bgColor;
+            if (textColor != null) cell.Phrase.Font.Color = textColor;
+            cell.Padding = 8;
+            cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+            table.AddCell(cell);
+        }
+
     }
 }

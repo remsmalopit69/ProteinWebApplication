@@ -209,4 +209,35 @@
     this.getBannerImages = function () {
         return $http.get("/Shop/GetBannerImages");
     }
+
+    // Get images by type
+    this.getImagesByType = function (imageType) {
+        return $http.get("/Admin/GetImagesByType", {
+            params: { imageType: imageType }
+        });
+    }
+
+    // Assign image to product
+    this.assignImageToProduct = function (productID, imageID) {
+        return $http({
+            method: "post",
+            url: "/Admin/AssignImageToProduct",
+            params: {
+                productID: productID,
+                imageID: imageID
+            }
+        });
+    }
+
+    // Assign image to category
+    this.assignImageToCategory = function (categoryID, imageID) {
+        return $http({
+            method: "post",
+            url: "/Admin/AssignImageToCategory",
+            params: {
+                categoryID: categoryID,
+                imageID: imageID
+            }
+        });
+    }
 });

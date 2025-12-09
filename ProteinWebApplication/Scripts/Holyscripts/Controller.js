@@ -45,6 +45,8 @@
         }
     });
 
+
+
     // ==================== USER AUTHENTICATION ====================
     $scope.userLoginData = {};
     $scope.userRegisterData = {};
@@ -683,6 +685,52 @@
             $scope.loadProducts();
         } else {
             $scope.loadProductsByCategory(categoryID);
+        }
+    }
+
+    // Load images by type
+    $scope.loadImagesByType = function (type) {
+        var getImages = ProteinWebApplicationService.getImagesByType(type);
+        getImages.then(function (response) {
+            $scope.availableImages = response.data;
+        });
+    }
+
+    // Assign image to product
+    $scope.assignProductImage = function (imageID) {
+        if ($scope.productForm.productID) {
+            var assign = ProteinWebApplicationService.assignImageToProduct($scope.productForm.productID, imageID);
+            assign.then(function (response) {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Image assigned to product',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    $scope.loadProducts();
+                }
+            });
+        }
+    }
+
+    // Assign image to category
+    $scope.assignCategoryImage = function (imageID) {
+        if ($scope.categoryForm.categoryID) {
+            var assign = ProteinWebApplicationService.assignImageToCategory($scope.categoryForm.categoryID, imageID);
+            assign.then(function (response) {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Image assigned to category',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    $scope.loadCategories();
+                }
+            });
         }
     }
 });

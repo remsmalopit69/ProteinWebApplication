@@ -1,38 +1,41 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Reports";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div>
-
     <!-- Header -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-800">PDF Reports</h2>
-        <p class="text-gray-600">Generate and download reports</p>
+        <p class="text-gray-600">Generate and download comprehensive business reports</p>
     </div>
 
     <!-- Report Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <!-- Sales Report -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
             <div class="flex items-center mb-4">
                 <div class="bg-blue-100 rounded-full p-4 mr-4">
                     <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800">Sales Report</h3>
-                    <p class="text-sm text-gray-600">View sales performance</p>
+                    <p class="text-sm text-gray-600">Complete sales overview</p>
                 </div>
             </div>
-            <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
-                <i class="fas fa-download mr-2"></i>Generate PDF
-            </button>
+            <p class="text-sm text-gray-500 mb-4">
+                Comprehensive report including total revenue, order count, and detailed transaction history.
+            </p>
+            <a href="/Admin/GenerateSalesReport"
+               class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
+               target="_blank">
+                <i class="fas fa-download mr-2"></i>Download PDF
+            </a>
         </div>
 
         <!-- Inventory Report -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 rounded-full p-4 mr-4">
                     <i class="fas fa-boxes text-green-500 text-2xl"></i>
@@ -42,13 +45,18 @@
                     <p class="text-sm text-gray-600">Current stock levels</p>
                 </div>
             </div>
-            <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition">
-                <i class="fas fa-download mr-2"></i>Generate PDF
-            </button>
+            <p class="text-sm text-gray-500 mb-4">
+                Detailed inventory status with stock quantities, product information, and low-stock alerts.
+            </p>
+            <a href="/Admin/GenerateInventoryReport"
+               class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition flex items-center justify-center"
+               target="_blank">
+                <i class="fas fa-download mr-2"></i>Download PDF
+            </a>
         </div>
 
         <!-- Order History Report -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
             <div class="flex items-center mb-4">
                 <div class="bg-purple-100 rounded-full p-4 mr-4">
                     <i class="fas fa-shopping-cart text-purple-500 text-2xl"></i>
@@ -58,57 +66,29 @@
                     <p class="text-sm text-gray-600">Complete order records</p>
                 </div>
             </div>
-            <button class="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition">
-                <i class="fas fa-download mr-2"></i>Generate PDF
-            </button>
+            <p class="text-sm text-gray-500 mb-4">
+                Full order history with customer details, order status, and payment information.
+            </p>
+            <a href="/Admin/GenerateSalesReport"
+               class="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition flex items-center justify-center"
+               target="_blank">
+                <i class="fas fa-download mr-2"></i>Download PDF
+            </a>
         </div>
 
     </div>
 
-    <!-- Custom Report Generator -->
-    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Custom Report Generator</h3>
-        <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-gray-700 font-medium mb-2">Report Type</label>
-                <select class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Sales Report</option>
-                    <option>Inventory Report</option>
-                    <option>Order History</option>
-                    <option>Category Performance</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium mb-2">Date Range</label>
-                <select class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Last 7 Days</option>
-                    <option>Last 30 Days</option>
-                    <option>Last 3 Months</option>
-                    <option>Last Year</option>
-                    <option>Custom Range</option>
-                </select>
-            </div>
-            <div class="md:col-span-2">
-                <button type="button" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition">
-                    <i class="fas fa-file-pdf mr-2"></i>Generate Custom Report
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Note -->
-    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+    <!-- Success Message -->
+    <div class="mt-8 bg-green-50 border-l-4 border-green-400 p-4 rounded">
         <div class="flex">
             <div class="flex-shrink-0">
-                <i class="fas fa-info-circle text-yellow-400"></i>
+                <i class="fas fa-check-circle text-green-400 text-xl"></i>
             </div>
             <div class="ml-3">
-                <p class="text-sm text-yellow-700">
-                    <strong>Note:</strong> PDF generation functionality requires iTextSharp or Rotativa NuGet package.
-                    Install the package and implement the PDF generation methods in the AdminController.
+                <p class="text-sm text-green-700">
+                    <strong>PDF Reports Ready!</strong> Click any report above to generate and download a professional PDF document.
                 </p>
             </div>
         </div>
     </div>
-
 </div>
