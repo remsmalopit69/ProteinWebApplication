@@ -1,87 +1,87 @@
-﻿
-@{
-    ViewBag.Title = "Dashboard";
+﻿@{
+    ViewBag.Title = "Overview";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div ng-init="loadDashboard()">
 
-    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Total Products -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <p class="text-gray-500 text-sm">Total Products</p>
-                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalProducts}}</h3>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Products</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{dashboardStats.totalProducts}}</h3>
                 </div>
-                <div class="bg-blue-100 rounded-full p-4">
-                    <i class="fas fa-box text-blue-500 text-2xl"></i>
+                <div class="p-2 bg-gray-50 rounded-lg text-gray-900">
+                    <i class="fas fa-box text-lg"></i>
                 </div>
             </div>
+            <div class="text-xs text-gray-400">Total items in inventory</div>
         </div>
 
-        <!-- Total Categories -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <p class="text-gray-500 text-sm">Total Categories</p>
-                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalCategories}}</h3>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Categories</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{dashboardStats.totalCategories}}</h3>
                 </div>
-                <div class="bg-green-100 rounded-full p-4">
-                    <i class="fas fa-folder text-green-500 text-2xl"></i>
+                <div class="p-2 bg-gray-50 rounded-lg text-gray-900">
+                    <i class="fas fa-folder text-lg"></i>
                 </div>
             </div>
+            <div class="text-xs text-gray-400">Active product categories</div>
         </div>
 
-        <!-- Total Orders -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <p class="text-gray-500 text-sm">Total Orders</p>
-                    <h3 class="text-3xl font-bold text-gray-800">{{dashboardStats.totalOrders}}</h3>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Orders</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{dashboardStats.totalOrders}}</h3>
                 </div>
-                <div class="bg-yellow-100 rounded-full p-4">
-                    <i class="fas fa-shopping-cart text-yellow-500 text-2xl"></i>
+                <div class="p-2 bg-gray-50 rounded-lg text-gray-900">
+                    <i class="fas fa-shopping-bag text-lg"></i>
                 </div>
             </div>
+            <div class="text-xs text-gray-400">Lifetime orders placed</div>
         </div>
 
-        <!-- Total Revenue -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-black text-white p-6 rounded-xl shadow-lg">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <p class="text-gray-500 text-sm">Total Revenue</p>
-                    <h3 class="text-3xl font-bold text-gray-800">₱{{dashboardStats.totalRevenue | number:2}}</h3>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Revenue</p>
+                    <h3 class="text-2xl font-bold mt-1">₱{{dashboardStats.totalRevenue | number:2}}</h3>
                 </div>
-                <div class="bg-purple-100 rounded-full p-4">
-                    <i class="fas fa-dollar-sign text-purple-500 text-2xl"></i>
+                <div class="p-2 bg-gray-800 rounded-lg text-white">
+                    <i class="fas fa-wallet text-lg"></i>
                 </div>
             </div>
+            <div class="text-xs text-gray-400">Net earnings</div>
         </div>
     </div>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Sales Chart -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Sales Trend</h3>
-            <canvas id="salesChart"></canvas>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-sm font-bold text-gray-900 uppercase">Sales Trend</h3>
+                <button class="text-xs text-gray-500 hover:text-black"><i class="fas fa-download mr-1"></i> Export</button>
+            </div>
+            <div class="relative h-64 w-full">
+                <canvas id="salesChart"></canvas>
+            </div>
         </div>
 
-        <!-- Products by Category Chart -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Products by Category</h3>
-            <canvas id="categoryChart"></canvas>
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+            <h3 class="text-sm font-bold text-gray-900 uppercase mb-6">Order Status</h3>
+            <div class="relative flex-grow flex items-center justify-center">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-900 uppercase mb-6">Products by Category</h3>
+            <div class="relative h-64 w-full">
+                <canvas id="categoryChart"></canvas>
+            </div>
         </div>
     </div>
-
-    <!-- Order Status Chart -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Order Status Distribution</h3>
-        <div class="max-w-md mx-auto">
-            <canvas id="orderStatusChart"></canvas>
-        </div>
-    </div>
-
 </div>
