@@ -240,4 +240,33 @@
             }
         });
     }
+
+    // Get hero image
+    this.getHeroImage = function () {
+        return $http.get("/Shop/GetHeroImage");
+    }
+
+    // Get feature images
+    this.getFeatureImages = function () {
+        return $http.get("/Shop/GetFeatureImages");
+    }
+
+    // Set as active image
+    this.setAsActiveImage = function (imageID, imageType) {
+        return $http({
+            method: "post",
+            url: "/Admin/SetAsActiveImage",
+            params: {
+                imageID: imageID,
+                imageType: imageType
+            }
+        });
+    }
+
+    // Get single image by type
+    this.getImageByType = function (imageType) {
+        return $http.get("/Admin/GetImageByType", {
+            params: { imageType: imageType }
+        });
+    }
 });

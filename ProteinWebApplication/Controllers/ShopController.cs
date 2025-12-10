@@ -192,5 +192,25 @@ namespace ProteinWebApplication.Controllers
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public JsonResult GetHeroImage()
+        {
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var hero = db.tbl_images
+                        .Where(x => x.imageType == "hero" && x.isArchive == 0)
+                        .OrderByDescending(x => x.createdAt)
+                        .Select(i => new { i.imageID, i.imagePath, i.imageName })
+                        .FirstOrDefault();
+                    return Json(hero, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

@@ -3,34 +3,9 @@
     Layout = "~/Views/Shared/_PublicLayout.cshtml";
 }
 
-<div ng-init="loadProducts(); loadCategories(); loadBanners();">
+<div ng-init="loadProducts(); loadCategories(); loadBanners(); loadHeroImage();">
 
-    <!-- Hero Section -->
-    <!--<section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h1 class="text-5xl font-bold mb-4">
-                        Fuel Your<br>Fitness Journey
-                    </h1>
-                    <p class="text-xl mb-8 text-blue-100">
-                        Premium protein supplements to help you reach your goals faster.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="/Shop/Products" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                            Shop Now
-                        </a>
-                        <a href="/Shop/About" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
-                            Learn More
-                        </a>
-                    </div>
-                </div>
-                <div class="hidden md:block">
-                    <img src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600" alt="Protein" class="rounded-lg shadow-2xl">
-                </div>
-            </div>
-        </div>
-    </section>-->
+    <!-- Hero Section with Dynamic Image -->
     <section>
         <div class="mx-auto max-w-screen-xl px-4 py-8 sm:py-12 sm:px-6 lg:py-16 lg:px-8">
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
@@ -41,16 +16,14 @@
                     </h1>
 
                     <p class="mt-4 text-gray-600">
-                        Your trusted Philippines-based reseller of authentic, high-quality protein supplements. We bring the best
-                        international brands directly to your doorstep with guaranteed freshness and competitive prices.
+                        Your trusted Philippines-based reseller of authentic, high-quality protein supplements.
                     </p>
 
                     <div class="mt-8 flex flex-wrap gap-4 text-center">
-                        <a href="/Shop/Products" class="block w-full rounded bg-black px-12 py-3 text-sm font-medium text-white shadow hover:bg-gray-800 focus:outline-none focus:ring sm:w-auto">
+                        <a href="/Shop/Products" class="block w-full rounded bg-black px-12 py-3 text-sm font-medium text-white shadow hover:bg-gray-800 sm:w-auto">
                             Shop Now
                         </a>
-
-                        <a href="/Shop/About" class="block w-full rounded border border-gray-300 px-12 py-3 text-sm font-medium text-black shadow hover:bg-gray-50 focus:outline-none focus:ring sm:w-auto">
+                        <a href="/Shop/About" class="block w-full rounded border border-gray-300 px-12 py-3 text-sm font-medium text-black shadow hover:bg-gray-50 sm:w-auto">
                             View Catalog
                         </a>
                     </div>
@@ -69,12 +42,13 @@
                             <span>Best Prices</span>
                         </div>
                     </div>
-
                 </div>
 
+                <!-- DYNAMIC HERO IMAGE -->
                 <div class="relative h-64 overflow-hidden rounded-lg sm:h-80 lg:h-full">
-                    <img alt="Protein Powder"
-                         src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600"
+                    <img ng-if="heroImage"
+                         ng-src="{{heroImage.imagePath}}"
+                         alt="{{heroImage.imageName}}"
                          class="absolute inset-0 h-full w-full object-cover" />
 
                     <div class="absolute bottom-4 left-4 rounded-lg bg-white/90 p-4 shadow-lg backdrop-blur-sm">

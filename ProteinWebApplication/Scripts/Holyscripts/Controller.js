@@ -733,4 +733,37 @@
             });
         }
     }
+
+    // Load hero image
+    $scope.loadHeroImage = function () {
+        var getHero = ProteinWebApplicationService.getHeroImage();
+        getHero.then(function (response) {
+            $scope.heroImage = response.data;
+        });
+    }
+
+    // Load feature images
+    $scope.loadFeatureImages = function () {
+        var getFeatures = ProteinWebApplicationService.getFeatureImages();
+        getFeatures.then(function (response) {
+            $scope.featureImages = response.data;
+        });
+    }
+
+    // Set as active image
+    $scope.setAsActive = function (imageID, imageType) {
+        var setActive = ProteinWebApplicationService.setAsActiveImage(imageID, imageType);
+        setActive.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Image set as active',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                $scope.loadImages();
+            }
+        });
+    }
 });

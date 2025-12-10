@@ -309,19 +309,53 @@ namespace ProteinWebApplication.Controllers
                 {
                     var images = db.tbl_images
                         .Where(x => x.isArchive == 0)
-                        .OrderBy(x => x.displayOrder)
+                        .OrderByDescending(x => x.createdAt)
+                        .Select(i => new
+                        {
+                            i.imageID,
+                            i.imageName,
+                            i.imagePath,
+                            i.imageType,
+                            i.referenceID,
+                            i.createdAt,
+                            isAssigned = i.referenceID != null
+                        })
                         .ToList();
                     return Json(images, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"An error occurred: {ex.Message} : {ex.InnerException} : {ex.StackTrace}");
+                throw new ArgumentException($"An error occurred: {ex.Message}");
+            }
+        }
+
+
+        // Get single image by type (for hero, banners, etc.)
+        public JsonResult GetImageByType(string imageType)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var image = db.tbl_images
+                        .Where(x => x.isArchive == 0 && x.imageType == imageType)
+                        .OrderByDescending(x => x.createdAt)
+                        .Select(i => new { i.imageID, i.imagePath, i.imageName })
+                        .FirstOrDefault();
+                    return Json(image, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
         [HttpPost]
-        public JsonResult UploadImage(HttpPostedFileBase imageFile, string imageType, int? referenceID, int displayOrder)
+        public JsonResult UploadImage(HttpPostedFileBase imageFile, string imageType, int? referenceID)
         {
             if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
 
@@ -349,7 +383,7 @@ namespace ProteinWebApplication.Controllers
                             imagePath = "/Content/Images/" + uniqueFileName,
                             imageType = imageType,
                             referenceID = referenceID,
-                            displayOrder = displayOrder,
+                            displayOrder = 0, // Not used anymore but keep for compatibility
                             createdAt = DateTime.Now,
                             updatedAt = DateTime.Now,
                             isArchive = 0
@@ -369,6 +403,8 @@ namespace ProteinWebApplication.Controllers
             }
         }
 
+        [HttpPost]
+        [HttpGet]
         public JsonResult ArchiveImage(int imageID)
         {
             if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
@@ -384,12 +420,63 @@ namespace ProteinWebApplication.Controllers
                     if (image != null)
                     {
                         image.isArchive = 1;
+                        image.updatedAt = DateTime.Now;
                         db.SaveChanges();
 
-                        var images = db.tbl_images.Where(x => x.isArchive == 0).ToList();
-                        return Json(new { success = true, data = images }, JsonRequestBehavior.AllowGet);
+                        var images = db.tbl_images
+                            .Where(x => x.isArchive == 0)
+                            .OrderByDescending(x => x.createdAt)
+                            .Select(i => new
+                            {
+                                i.imageID,
+                                i.imageName,
+                                i.imagePath,
+                                i.imageType,
+                                i.referenceID,
+                                i.createdAt,
+                                isAssigned = i.referenceID != null
+                            })
+                            .ToList();
+
+                        return Json(new { success = true, data = images, message = "Image archived successfully" }, JsonRequestBehavior.AllowGet);
                     }
                     return Json(new { success = false, message = "Image not found" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult SetAsActiveImage(int imageID, string imageType)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    // Archive all other images of this type without referenceID
+                    var otherImages = db.tbl_images
+                        .Where(x => x.imageType == imageType && x.referenceID == null && x.imageID != imageID)
+                        .ToList();
+
+                    foreach (var img in otherImages)
+                    {
+                        img.isArchive = 1;
+                    }
+
+                    // Make sure the selected image is active
+                    var selectedImage = db.tbl_images.FirstOrDefault(x => x.imageID == imageID);
+                    if (selectedImage != null)
+                    {
+                        selectedImage.isArchive = 0;
+                        selectedImage.updatedAt = DateTime.Now;
+                    }
+
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Image set as active" }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
