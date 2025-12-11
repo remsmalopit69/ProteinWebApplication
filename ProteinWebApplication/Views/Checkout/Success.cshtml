@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Order Confirmed";
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+}
+
+<div ng-init="loadOrderDetails(@ViewBag.OrderID)">
+
+    <!-- Success Header -->
+    <section class="bg-green-50 py-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-white text-4xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Order Confirmed!</h1>
+                <p class="text-xl text-gray-600 mb-2">Thank you for your order</p>
+                <p class="text-gray-500">Your order has been placed successfully and is being processed</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Details -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+
+                <!-- Order Info Card -->
+                <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                    <div class="flex justify-between items-start mb-6 pb-6 border-b">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Order #@ViewBag.OrderID</h2>
+                            <p class="text-gray-600">Order placed on {{orderDetails.orderDate | date:'MMMM dd, yyyy'}}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-semibold">
+                                {{orderDetails.orderStatus}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Customer & Shipping Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                Customer Information
+                            </h3>
+                            <div class="text-gray-600 space-y-2">
+                                <p><strong>Name:</strong> {{orderDetails.customerName}}</p>
+                                <p><strong>Email:</strong> {{orderDetails.customerEmail}}</p>
+                                <p><strong>Phone:</strong> {{orderDetails.customerPhone}}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-truck mr-2 text-blue-600"></i>
+                                Shipping Address
+                            </h3>
+                            <p class="text-gray-600">{{orderDetails.shippingAddress}}</p>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-4">Order Items</h3>
+                        <div class="space-y-4">
+                            <div ng-repeat="item in orderDetails.items" class="flex justify-between items-center py-4 border-b">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900">{{item.productName}}</h4>
+                                    <p class="text-sm text-gray-600">Quantity: {{item.quantity}}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-900">₱{{item.subtotal | number:2}}</p>
+                                    <p class="text-sm text-gray-500">₱{{item.unitPrice | number:2}} each</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Total -->
+                    <div class="mt-8 pt-6 border-t">
+                        <div class="flex justify-between items-center text-xl font-bold">
+                            <span>Total Amount</span>
+                            <span class="text-blue-600">₱{{orderDetails.totalAmount | number:2}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What's Next -->
+                <div class="bg-blue-50 rounded-lg p-8 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">What's Next?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-box text-white text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">Order Processing</h4>
+                            <p class="text-sm text-gray-600">We're preparing your order for shipment</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-shipping-fast text-white text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">On the Way</h4>
+                            <p class="text-sm text-gray-600">You'll receive a tracking number via email</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-home text-white text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">Delivered</h4>
+                            <p class="text-sm text-gray-600">Your order will arrive within 3-5 business days</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/Shop/Products" class="flex-1 bg-blue-600 text-white text-center py-4 rounded-lg font-bold hover:bg-blue-700 transition">
+                        Continue Shopping
+                    </a>
+                    <button onclick="window.print()" class="flex-1 border-2 border-gray-300 text-gray-700 text-center py-4 rounded-lg font-bold hover:bg-gray-50 transition">
+                        <i class="fas fa-print mr-2"></i>Print Order
+                    </button>
+                </div>
+
+                <!-- Contact Support -->
+                <div class="mt-8 text-center">
+                    <p class="text-gray-600 mb-2">Need help with your order?</p>
+                    <a href="/Home/Contact" class="text-blue-600 hover:text-blue-700 font-semibold">
+                        Contact Support <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section scripts {
+    <script>
+        angular.element(document).ready(function () {
+            var scope = angular.element(document.querySelector('[ng-controller="ProteinWebApplicationController"]')).scope();
+
+            scope.loadOrderDetails = function (orderID) {
+                var getOrder = scope.ProteinWebApplicationService || ProteinWebApplicationService;
+
+                if (getOrder && getOrder.getOrderDetails) {
+                    var request = getOrder.getOrderDetails(orderID);
+                    request.then(function (response) {
+                        scope.$apply(function () {
+                            scope.orderDetails = response.data;
+                        });
+                    });
+                }
+            };
+        });
+    </script>
+}

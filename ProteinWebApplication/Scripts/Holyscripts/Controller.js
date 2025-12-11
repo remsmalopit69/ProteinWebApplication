@@ -1151,34 +1151,89 @@
     }
 
     // Add these cart management functions to your Controller.js
+    // Add these cart management functions to your Controller.js
+    // Replace the existing cart functions with these fixed versions
 
     // ==================== SHOPPING CART ====================
 
     // Initialize cart from localStorage
-    $scope.cart = JSON.parse(localStorage.getItem('proteinCart')) || [];
+    $scope.cart = [];
+    $scope.cartTotal = 0;
+
+    // Load cart on initialization
+    $scope.loadCart = function () {
+        try {
+            var storedCart = localStorage.getItem('proteinCart');
+            if (storedCart) {
+                $scope.cart = JSON.parse(storedCart);
+                $scope.calculateCartTotal();
+            }
+        } catch (e) {
+            console.error('Error loading cart:', e);
+            $scope.cart = [];
+        }
+    };
 
     // Save cart to localStorage
     $scope.saveCart = function () {
-        localStorage.setItem('proteinCart', JSON.stringify($scope.cart));
-    }
+        try {
+            localStorage.setItem('proteinCart', JSON.stringify($scope.cart));
+            $scope.calculateCartTotal();
+        } catch (e) {
+            console.error('Error saving cart:', e);
+        }
+    };
 
-    // Load cart
-    $scope.loadCart = function () {
-        $scope.cart = JSON.parse(localStorage.getItem('proteinCart')) || [];
-    }
+    // Calculate cart total
+    $scope.calculateCartTotal = function () {
+        $scope.cartTotal = 0;
+        $scope.cart.forEach(function (item) {
+            $scope.cartTotal += (item.price * (item.quantity || 1));
+        });
+    };
 
-    // Add to cart
-    $scope.addToCart = function (product) {
+    // Add to cart with quantity support
+    $scope.addToCart = function (product, quantity) {
+        quantity = quantity || 1;
+
+        if (product.stockQuantity < quantity) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Insufficient Stock',
+                text: 'Only ' + product.stockQuantity + ' items available',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
         // Check if product already exists in cart
         var existingItem = $scope.cart.find(function (item) {
             return item.productID === product.productID;
         });
 
         if (existingItem) {
-            existingItem.quantity = (existingItem.quantity || 1) + 1;
+            var newQuantity = existingItem.quantity + quantity;
+            if (newQuantity > product.stockQuantity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Stock Limit',
+                    text: 'Cannot add more than available stock',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+            existingItem.quantity = newQuantity;
         } else {
-            var cartItem = angular.copy(product);
-            cartItem.quantity = 1;
+            var cartItem = {
+                productID: product.productID,
+                productName: product.productName,
+                price: product.price,
+                image: product.image || product.images?.[0]?.imagePath,
+                stockQuantity: product.stockQuantity,
+                quantity: quantity
+            };
             $scope.cart.push(cartItem);
         }
 
@@ -1191,29 +1246,50 @@
             timer: 1500,
             showConfirmButton: false
         });
-    }
+    };
 
-    // Add to cart from related products
-    $scope.addToCartFromRelated = function (product) {
-        $scope.addToCart(product);
-    }
+    // Update cart quantity
+    $scope.updateCartQuantity = function (item, newQuantity) {
+        if (newQuantity < 1) {
+            $scope.removeFromCart(item);
+            return;
+        }
+
+        if (newQuantity > item.stockQuantity) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Stock Limit',
+                text: 'Cannot add more than available stock',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            item.quantity = item.stockQuantity;
+            return;
+        }
+
+        item.quantity = newQuantity;
+        $scope.saveCart();
+    };
 
     // Remove from cart
-    $scope.removeFromCart = function (item) {
-        Swal.fire({
-            title: 'Remove Item?',
-            text: 'Remove ' + item.productName + ' from cart?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, remove it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var index = $scope.cart.indexOf(item);
-                if (index > -1) {
-                    $scope.cart.splice(index, 1);
-                    $scope.saveCart();
+    $scope.removeFromCart = function (index) {
+        if (index >= 0 && index < $scope.cart.length) {
+            var item = $scope.cart[index];
+
+            Swal.fire({
+                title: 'Remove Item?',
+                text: 'Remove ' + item.productName + ' from cart?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, remove it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $scope.$apply(function () {
+                        $scope.cart.splice(index, 1);
+                        $scope.saveCart();
+                    });
 
                     Swal.fire({
                         icon: 'success',
@@ -1223,51 +1299,9 @@
                         showConfirmButton: false
                     });
                 }
-            }
-        });
-    }
-
-    // Increase quantity
-    $scope.increaseQuantity = function (item) {
-        if (!item.quantity) item.quantity = 1;
-        if (item.quantity < item.stockQuantity) {
-            item.quantity++;
-            $scope.saveCart();
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Stock Limit',
-                text: 'Cannot add more than available stock',
-                timer: 2000,
-                showConfirmButton: false
             });
         }
-    }
-
-    // Decrease quantity
-    $scope.decreaseQuantity = function (item) {
-        if (!item.quantity) item.quantity = 1;
-        if (item.quantity > 1) {
-            item.quantity--;
-            $scope.saveCart();
-        }
-    }
-
-    // Calculate cart subtotal
-    $scope.getCartSubtotal = function () {
-        var subtotal = 0;
-        $scope.cart.forEach(function (item) {
-            subtotal += item.price * (item.quantity || 1);
-        });
-        return subtotal;
-    }
-
-    // Calculate cart total (with shipping)
-    $scope.getCartTotal = function () {
-        var subtotal = $scope.getCartSubtotal();
-        var shipping = subtotal >= 2000 ? 0 : 150;
-        return subtotal + shipping;
-    }
+    };
 
     // Get cart count for navbar
     $scope.getCartCount = function () {
@@ -1276,15 +1310,61 @@
             count += (item.quantity || 1);
         });
         return count;
-    }
+    };
 
-    // Proceed to checkout
-    $scope.proceedToCheckout = function () {
+    // Get cart subtotal
+    $scope.getCartSubtotal = function () {
+        return $scope.cartTotal;
+    };
+
+    // Get cart total (with shipping if needed)
+    $scope.getCartTotal = function () {
+        var subtotal = $scope.getCartSubtotal();
+        // Free shipping in this case
+        return subtotal;
+    };
+
+    // ==================== CHECKOUT FUNCTIONS ====================
+
+    // Initialize checkout
+    $scope.initCheckout = function () {
+        $scope.loadCart();
+
+        if ($scope.cart.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Empty Cart',
+                text: 'Your cart is empty. Add some products first!',
+                confirmButtonText: 'Browse Products'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/Shop/Products";
+                }
+            });
+            return;
+        }
+
+        // Pre-fill user data if logged in
+        if ($scope.isUserLoggedIn && $scope.currentUser) {
+            $scope.checkoutForm = {
+                customerName: $scope.currentUser.userName || '',
+                customerEmail: $scope.currentUser.userEmail || '',
+                customerPhone: '',
+                shippingAddress: '',
+                orderNotes: ''
+            };
+        } else {
+            $scope.checkoutForm = {};
+        }
+    };
+
+    // Process checkout
+    $scope.processCheckout = function () {
         if (!$scope.isUserLoggedIn) {
             Swal.fire({
                 icon: 'info',
                 title: 'Login Required',
-                text: 'Please login to proceed with checkout',
+                text: 'Please login to complete your order',
                 showCancelButton: true,
                 confirmButtonText: 'Go to Login',
                 cancelButtonText: 'Cancel'
@@ -1296,16 +1376,103 @@
             return;
         }
 
-        // For now, just show a coming soon message
-        // You can implement the actual checkout later
-        Swal.fire({
-            icon: 'info',
-            title: 'Checkout',
-            text: 'Checkout functionality coming soon!',
-            confirmButtonText: 'OK'
-        });
-    }
+        if ($scope.cart.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Empty Cart',
+                text: 'Your cart is empty!'
+            });
+            return;
+        }
 
-    // Update the existing addToCart function if it exists
-    // Make sure to use the new implementation above
+        // Validate form
+        if (!$scope.checkoutForm.customerName || !$scope.checkoutForm.customerEmail ||
+            !$scope.checkoutForm.customerPhone || !$scope.checkoutForm.shippingAddress) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required Fields',
+                text: 'Please fill in all required fields'
+            });
+            return;
+        }
+
+        // Prepare order data
+        var checkoutData = {
+            customerName: $scope.checkoutForm.customerName,
+            customerEmail: $scope.checkoutForm.customerEmail,
+            customerPhone: $scope.checkoutForm.customerPhone,
+            shippingAddress: $scope.checkoutForm.shippingAddress,
+            totalAmount: $scope.getCartTotal(),
+            orderItems: $scope.cart.map(function (item) {
+                return {
+                    productID: item.productID,
+                    quantity: item.quantity,
+                    unitPrice: item.price
+                };
+            })
+        };
+
+        // Show loading
+        Swal.fire({
+            title: 'Processing Order...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Submit order
+        var processCheckout = ProteinWebApplicationService.processCheckout(checkoutData);
+        processCheckout.then(function (response) {
+            Swal.close();
+
+            if (response.data.success) {
+                // Clear cart
+                $scope.cart = [];
+                localStorage.removeItem('proteinCart');
+
+                // Show success and redirect
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Order Placed!',
+                    text: 'Order #' + response.data.orderID + ' has been placed successfully!',
+                    confirmButtonText: 'View Order'
+                }).then(() => {
+                    window.location.href = "/Checkout/Success?orderID=" + response.data.orderID;
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Order Failed',
+                    text: response.data.message
+                });
+            }
+        }, function (error) {
+            Swal.close();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while processing your order'
+            });
+        });
+    };
+
+    // Load user orders
+    $scope.loadMyOrders = function () {
+        if (!$scope.isUserLoggedIn) {
+            window.location.href = "/Account/Login";
+            return;
+        }
+
+        var getOrders = ProteinWebApplicationService.getMyOrders();
+        getOrders.then(function (response) {
+            if (response.data.success !== false) {
+                $scope.myOrders = response.data;
+            }
+        });
+    };
+
+    // Initialize cart when controller loads
+    $scope.loadCart();
 });

@@ -149,176 +149,176 @@ namespace ProteinWebApplication.Controllers
             return View();
         }
 
-        // Process checkout and create order
-        [HttpPost]
-        public JsonResult ProcessCheckout(CheckoutModel checkoutData)
-        {
-            try
-            {
-                if (Session["UserID"] == null)
-                {
-                    return Json(new { success = false, message = "Please login to checkout" }, JsonRequestBehavior.AllowGet);
-                }
+        //    // Process checkout and create order
+        //    [HttpPost]
+        //    public JsonResult ProcessCheckout(CheckoutModel checkoutData)
+        //    {
+        //        try
+        //        {
+        //            if (Session["UserID"] == null)
+        //            {
+        //                return Json(new { success = false, message = "Please login to checkout" }, JsonRequestBehavior.AllowGet);
+        //            }
 
-                using (var db = new ProteinContext())
-                {
-                    // Create new order
-                    var order = new tblOrdersModel
-                    {
-                        customerName = checkoutData.customerName,
-                        customerEmail = checkoutData.customerEmail,
-                        customerPhone = checkoutData.customerPhone,
-                        shippingAddress = checkoutData.shippingAddress,
-                        totalAmount = checkoutData.totalAmount,
-                        orderStatus = "pending",
-                        orderDate = DateTime.Now,
-                        createdAt = DateTime.Now,
-                        updatedAt = DateTime.Now,
-                        isArchive = 0
-                    };
+        //            using (var db = new ProteinContext())
+        //            {
+        //                // Create new order
+        //                var order = new tblOrdersModel
+        //                {
+        //                    customerName = checkoutData.customerName,
+        //                    customerEmail = checkoutData.customerEmail,
+        //                    customerPhone = checkoutData.customerPhone,
+        //                    shippingAddress = checkoutData.shippingAddress,
+        //                    totalAmount = checkoutData.totalAmount,
+        //                    orderStatus = "pending",
+        //                    orderDate = DateTime.Now,
+        //                    createdAt = DateTime.Now,
+        //                    updatedAt = DateTime.Now,
+        //                    isArchive = 0
+        //                };
 
-                    db.tbl_orders.Add(order);
-                    db.SaveChanges();
+        //                db.tbl_orders.Add(order);
+        //                db.SaveChanges();
 
-                    // Save order items
-                    foreach (var item in checkoutData.items)
-                    {
-                        var orderItem = new tblOrderItemsModel
-                        {
-                            orderID = order.orderID,
-                            productID = item.productID,
-                            quantity = item.quantity,
-                            unitPrice = item.unitPrice,
-                            subtotal = item.quantity * item.unitPrice,
-                            createdAt = DateTime.Now,
-                            isArchive = 0
-                        };
+        //                // Save order items
+        //                foreach (var item in checkoutData.items)
+        //                {
+        //                    var orderItem = new tblOrderItemsModel
+        //                    {
+        //                        orderID = order.orderID,
+        //                        productID = item.productID,
+        //                        quantity = item.quantity,
+        //                        unitPrice = item.unitPrice,
+        //                        subtotal = item.quantity * item.unitPrice,
+        //                        createdAt = DateTime.Now,
+        //                        isArchive = 0
+        //                    };
 
-                        db.tbl_order_items.Add(orderItem);
+        //                    db.tbl_order_items.Add(orderItem);
 
-                        // Update product stock
-                        var product = db.tbl_products.FirstOrDefault(p => p.productID == item.productID);
-                        if (product != null)
-                        {
-                            product.stockQuantity -= item.quantity;
-                            product.updatedAt = DateTime.Now;
-                        }
-                    }
+        //                    // Update product stock
+        //                    var product = db.tbl_products.FirstOrDefault(p => p.productID == item.productID);
+        //                    if (product != null)
+        //                    {
+        //                        product.stockQuantity -= item.quantity;
+        //                        product.updatedAt = DateTime.Now;
+        //                    }
+        //                }
 
-                    db.SaveChanges();
+        //                db.SaveChanges();
 
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Order placed successfully!",
-                        orderID = order.orderID
-                    }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
+        //                return Json(new
+        //                {
+        //                    success = true,
+        //                    message = "Order placed successfully!",
+        //                    orderID = order.orderID
+        //                }, JsonRequestBehavior.AllowGet);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
 
-        // Get user's orders
-        public JsonResult GetMyOrders()
-        {
-            try
-            {
-                if (Session["UserID"] == null)
-                {
-                    return Json(new { success = false, message = "Not logged in" }, JsonRequestBehavior.AllowGet);
-                }
+        //    // Get user's orders
+        //    public JsonResult GetMyOrders()
+        //    {
+        //        try
+        //        {
+        //            if (Session["UserID"] == null)
+        //            {
+        //                return Json(new { success = false, message = "Not logged in" }, JsonRequestBehavior.AllowGet);
+        //            }
 
-                var userEmail = Session["UserEmail"]?.ToString();
+        //            var userEmail = Session["UserEmail"]?.ToString();
 
-                using (var db = new ProteinContext())
-                {
-                    var orders = db.tbl_orders
-                        .Where(x => x.customerEmail == userEmail && x.isArchive == 0)
-                        .OrderByDescending(x => x.orderDate)
-                        .Select(o => new
-                        {
-                            o.orderID,
-                            o.customerName,
-                            o.totalAmount,
-                            o.orderStatus,
-                            o.orderDate,
-                            itemCount = db.tbl_order_items.Count(i => i.orderID == o.orderID)
-                        })
-                        .ToList();
+        //            using (var db = new ProteinContext())
+        //            {
+        //                var orders = db.tbl_orders
+        //                    .Where(x => x.customerEmail == userEmail && x.isArchive == 0)
+        //                    .OrderByDescending(x => x.orderDate)
+        //                    .Select(o => new
+        //                    {
+        //                        o.orderID,
+        //                        o.customerName,
+        //                        o.totalAmount,
+        //                        o.orderStatus,
+        //                        o.orderDate,
+        //                        itemCount = db.tbl_order_items.Count(i => i.orderID == o.orderID)
+        //                    })
+        //                    .ToList();
 
-                    return Json(orders, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
+        //                return Json(orders, JsonRequestBehavior.AllowGet);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
 
-        // Get order details
-        public JsonResult GetOrderDetails(int orderID)
-        {
-            try
-            {
-                using (var db = new ProteinContext())
-                {
-                    var order = db.tbl_orders
-                        .Where(x => x.orderID == orderID)
-                        .Select(o => new
-                        {
-                            o.orderID,
-                            o.customerName,
-                            o.customerEmail,
-                            o.customerPhone,
-                            o.shippingAddress,
-                            o.totalAmount,
-                            o.orderStatus,
-                            o.orderDate,
-                            items = db.tbl_order_items
-                                .Where(i => i.orderID == orderID)
-                                .Select(i => new
-                                {
-                                    i.orderItemID,
-                                    i.productID,
-                                    productName = db.tbl_products
-                                        .Where(p => p.productID == i.productID)
-                                        .Select(p => p.productName)
-                                        .FirstOrDefault(),
-                                    i.quantity,
-                                    i.unitPrice,
-                                    i.subtotal
-                                })
-                                .ToList()
-                        })
-                        .FirstOrDefault();
+        //    // Get order details
+        //    public JsonResult GetOrderDetails(int orderID)
+        //    {
+        //        try
+        //        {
+        //            using (var db = new ProteinContext())
+        //            {
+        //                var order = db.tbl_orders
+        //                    .Where(x => x.orderID == orderID)
+        //                    .Select(o => new
+        //                    {
+        //                        o.orderID,
+        //                        o.customerName,
+        //                        o.customerEmail,
+        //                        o.customerPhone,
+        //                        o.shippingAddress,
+        //                        o.totalAmount,
+        //                        o.orderStatus,
+        //                        o.orderDate,
+        //                        items = db.tbl_order_items
+        //                            .Where(i => i.orderID == orderID)
+        //                            .Select(i => new
+        //                            {
+        //                                i.orderItemID,
+        //                                i.productID,
+        //                                productName = db.tbl_products
+        //                                    .Where(p => p.productID == i.productID)
+        //                                    .Select(p => p.productName)
+        //                                    .FirstOrDefault(),
+        //                                i.quantity,
+        //                                i.unitPrice,
+        //                                i.subtotal
+        //                            })
+        //                            .ToList()
+        //                    })
+        //                    .FirstOrDefault();
 
-                    return Json(order, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
-    }
-    // Model for checkout data
-    public class CheckoutModel
-    {
-        public string customerName { get; set; }
-        public string customerEmail { get; set; }
-        public string customerPhone { get; set; }
-        public string shippingAddress { get; set; }
-        public decimal totalAmount { get; set; }
-        public CheckoutItemModel[] items { get; set; }
-    }
+        //                return Json(order, JsonRequestBehavior.AllowGet);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //}
+        //// Model for checkout data
+        //public class CheckoutModel
+        //{
+        //    public string customerName { get; set; }
+        //    public string customerEmail { get; set; }
+        //    public string customerPhone { get; set; }
+        //    public string shippingAddress { get; set; }
+        //    public decimal totalAmount { get; set; }
+        //    public CheckoutItemModel[] items { get; set; }
+        //}
 
-    public class CheckoutItemModel
-    {
-        public int productID { get; set; }
-        public int quantity { get; set; }
-        public decimal unitPrice { get; set; }
+        //public class CheckoutItemModel
+        //{
+        //    public int productID { get; set; }
+        //    public int quantity { get; set; }
+        //    public decimal unitPrice { get; set; }
     }
 }

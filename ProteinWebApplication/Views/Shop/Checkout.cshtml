@@ -14,7 +14,7 @@
     </section>
 
     <!-- Checkout Section -->
-    <section class="py-12 bg-gray-50">
+    <section class="py-12 bg-gray-50 min-h-screen">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -23,7 +23,7 @@
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6">Shipping Information</h2>
 
-                        <form ng-submit="processCheckout()">
+                        <form ng-submit="processCheckout()" name="checkoutFormValidation">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
@@ -83,7 +83,8 @@
                             </div>
 
                             <button type="submit"
-                                    class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition">
+                                    ng-disabled="cart.length === 0"
+                                    class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
                                 <i class="fas fa-check-circle mr-2"></i>Place Order
                             </button>
                         </form>
@@ -96,7 +97,7 @@
                         <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
                         <!-- Cart Items -->
-                        <div class="space-y-4 mb-6 max-h-64 overflow-y-auto">
+                        <div class="space-y-4 mb-6 max-h-96 overflow-y-auto">
                             <div ng-repeat="item in cart" class="flex gap-4 pb-4 border-b">
                                 <img ng-src="{{item.image || 'https://via.placeholder.com/80'}}"
                                      alt="{{item.productName}}"
@@ -118,7 +119,7 @@
                         <div class="space-y-3 mb-6 pt-4 border-t">
                             <div class="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>₱{{cartTotal | number:2}}</span>
+                                <span>₱{{getCartSubtotal() | number:2}}</span>
                             </div>
                             <div class="flex justify-between text-gray-600">
                                 <span>Shipping</span>
@@ -126,7 +127,7 @@
                             </div>
                             <div class="flex justify-between text-xl font-bold text-gray-800 pt-3 border-t">
                                 <span>Total</span>
-                                <span class="text-blue-600">₱{{cartTotal | number:2}}</span>
+                                <span class="text-blue-600">₱{{getCartTotal() | number:2}}</span>
                             </div>
                         </div>
 
