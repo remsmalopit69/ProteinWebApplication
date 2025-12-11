@@ -590,31 +590,68 @@
     // ==================== CHART RENDERING ====================
     $scope.renderSalesChart = function (data) {
         var ctx = document.getElementById('salesChart').getContext('2d');
+
+        // Create a beautiful gradient
+        var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)'); // Blue top
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); // Transparent bottom
+
         var labels = data.map(function (item) {
-            return new Date(item.date).toLocaleDateString();
+            // Format date to look cleaner (e.g., "Oct 24")
+            return new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         });
         var values = data.map(function (item) {
             return item.sales;
         });
 
-        new Chart(ctx, {
+        // Destroy existing chart if it exists to prevent "glitching" on reload
+        if (window.mySalesChart) window.mySalesChart.destroy();
+
+        window.mySalesChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Daily Sales',
+                    label: 'Revenue (₱)',
                     data: values,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
+                    borderColor: '#3b82f6', // Solid Blue
+                    backgroundColor: gradient, // Use the gradient
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true, // Fill the area under the line
+                    tension: 0.4 // Makes the line smooth/curvy
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Sales Trend (Last 7 Days)'
+                    legend: { display: false }, // Hide legend for cleaner look
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function (context) {
+                                return ' Sales: ₱' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [2, 4], color: '#f3f4f6' }, // Dotted grid lines
+                        ticks: {
+                            callback: function (value) { return '₱' + value; } // Add currency symbol
+                        }
+                    },
+                    x: {
+                        grid: { display: false } // Remove vertical grid lines
                     }
                 }
             }
@@ -623,41 +660,36 @@
 
     $scope.renderCategoryChart = function (data) {
         var ctx = document.getElementById('categoryChart').getContext('2d');
-        var labels = data.map(function (item) {
-            return item.categoryName;
-        });
-        var values = data.map(function (item) {
-            return item.productCount;
-        });
+        var labels = data.map(item => item.categoryName);
+        var values = data.map(item => item.productCount);
 
-        new Chart(ctx, {
+        if (window.myCategoryChart) window.myCategoryChart.destroy();
+
+        window.myCategoryChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Products Count',
+                    label: 'Products',
                     data: values,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)'
-                    ],
-                    borderWidth: 1
+                    backgroundColor: '#8b5cf6', // A nice solid Violet color
+                    borderRadius: 6, // Rounded top corners on bars
+                    barPercentage: 0.6 // Makes bars slightly thinner
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Products by Category'
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
                     }
                 }
             }
@@ -666,33 +698,38 @@
 
     $scope.renderOrderStatusChart = function (data) {
         var ctx = document.getElementById('orderStatusChart').getContext('2d');
-        var labels = data.map(function (item) {
-            return item.status;
-        });
-        var values = data.map(function (item) {
-            return item.count;
-        });
+        var labels = data.map(item => item.status.charAt(0).toUpperCase() + item.status.slice(1)); // Capitalize
+        var values = data.map(item => item.count);
 
-        new Chart(ctx, {
-            type: 'pie',
+        // Dynamic colors based on status content usually works best, but here is a nice fixed palette
+        var bgColors = [
+            '#10b981', // Emerald (Completed)
+            '#f59e0b', // Amber (Pending)
+            '#3b82f6', // Blue (Processing)
+            '#ef4444'  // Red (Cancelled)
+        ];
+
+        if (window.myStatusChart) window.myStatusChart.destroy();
+
+        window.myStatusChart = new Chart(ctx, {
+            type: 'doughnut', // Change from 'pie' to 'doughnut'
             data: {
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)'
-                    ]
+                    backgroundColor: bgColors,
+                    borderWidth: 0, // Remove white borders between slices
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', // Makes the ring thinner
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Order Status Distribution'
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 20 }
                     }
                 }
             }

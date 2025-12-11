@@ -29,7 +29,8 @@ namespace ProteinWebApplication.Controllers
         {
             var authCheck = CheckUserAccess();
             if (authCheck != null) return authCheck;
-            return View();
+            // Explicitly tell it to use the file in the Shop folder
+            return View("~/Views/Shop/Checkout.cshtml");
         }
 
         // FIXED: Make orderID nullable with default value
