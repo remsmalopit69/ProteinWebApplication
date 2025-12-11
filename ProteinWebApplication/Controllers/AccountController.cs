@@ -35,11 +35,42 @@ namespace ProteinWebApplication.Controllers
         {
             try
             {
+                // Server-side validation
+                if (string.IsNullOrWhiteSpace(user.fullName) || user.fullName.Length < 2)
+                {
+                    return Json(new { success = false, message = "Full name must be at least 2 characters" }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrWhiteSpace(user.username) || user.username.Length < 3)
+                {
+                    return Json(new { success = false, message = "Username must be at least 3 characters" }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrWhiteSpace(user.email) || !IsValidEmail(user.email))
+                {
+                    return Json(new { success = false, message = "Invalid email address" }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrWhiteSpace(user.phoneNumber) || !IsValidPhoneNumber(user.phoneNumber))
+                {
+                    return Json(new { success = false, message = "Invalid phone number format" }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrWhiteSpace(user.address) || user.address.Length < 10)
+                {
+                    return Json(new { success = false, message = "Address must be at least 10 characters" }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (string.IsNullOrWhiteSpace(user.password) || user.password.Length < 6)
+                {
+                    return Json(new { success = false, message = "Password must be at least 6 characters" }, JsonRequestBehavior.AllowGet);
+                }
+
                 using (var db = new ProteinContext())
                 {
                     // Check if username already exists
                     var existingUsername = db.tbl_users
-                        .Where(x => x.username == user.username && x.isArchive == 0)
+                        .Where(x => x.username.ToLower() == user.username.ToLower() && x.isArchive == 0)
                         .FirstOrDefault();
 
                     if (existingUsername != null)
@@ -49,7 +80,7 @@ namespace ProteinWebApplication.Controllers
 
                     // Check if email already exists
                     var existingEmail = db.tbl_users
-                        .Where(x => x.email == user.email && x.isArchive == 0)
+                        .Where(x => x.email.ToLower() == user.email.ToLower() && x.isArchive == 0)
                         .FirstOrDefault();
 
                     if (existingEmail != null)
@@ -57,11 +88,17 @@ namespace ProteinWebApplication.Controllers
                         return Json(new { success = false, message = "Email already exists" }, JsonRequestBehavior.AllowGet);
                     }
 
-                    // Create new user
-                    user.role = "customer"; // THIS WAS MISSING!
+                    // Sanitize inputs
+                    user.fullName = user.fullName.Trim();
+                    user.username = user.username.Trim().ToLower();
+                    user.email = user.email.Trim().ToLower();
+                    user.phoneNumber = user.phoneNumber.Trim();
+                    user.address = user.address.Trim();
+                    user.role = "customer";
                     user.createdAt = DateTime.Now;
                     user.updatedAt = DateTime.Now;
                     user.isArchive = 0;
+
                     db.tbl_users.Add(user);
                     db.SaveChanges();
 
@@ -73,7 +110,28 @@ namespace ProteinWebApplication.Controllers
                 return Json(new { success = false, message = $"Error: {ex.Message}" }, JsonRequestBehavior.AllowGet);
             }
         }
+        // Helper methods
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
+        private bool IsValidPhoneNumber(string phoneNumber)
+        {
+            // Remove common formatting characters
+            string cleanNumber = phoneNumber.Replace("-", "").Replace(" ", "").Replace("(", "").Replace(")", "");
+
+            // Check if it contains only digits and has reasonable length (10-15 digits)
+            return System.Text.RegularExpressions.Regex.IsMatch(cleanNumber, @"^\d{10,15}$");
+        }
         public JsonResult LoginUser(string username, string password)
         {
             try

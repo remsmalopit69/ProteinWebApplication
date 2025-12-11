@@ -52,7 +52,28 @@
     $scope.userRegisterData = {};
 
     $scope.userLogin = function () {
-        if (!$scope.userLoginData.username || !$scope.userLoginData.password) {
+        // Check form validity
+        if ($scope.loginForm.$invalid) {
+            // Mark all fields as touched to show errors
+            angular.forEach($scope.loginForm.$error, function (field) {
+                angular.forEach(field, function (errorField) {
+                    errorField.$setTouched();
+                });
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation Error',
+                text: 'Please fill in all required fields correctly'
+            });
+            return;
+        }
+
+        // Sanitize inputs
+        var username = $scope.userLoginData.username.trim();
+        var password = $scope.userLoginData.password;
+
+        if (!username || !password) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Required Fields',
@@ -61,7 +82,7 @@
             return;
         }
 
-        var loginRequest = ProteinWebApplicationService.loginUser($scope.userLoginData.username, $scope.userLoginData.password);
+        var loginRequest = ProteinWebApplicationService.loginUser(username, password);
         loginRequest.then(function (response) {
             if (response.data.success) {
                 Swal.fire({
@@ -75,7 +96,8 @@
                         window.location.href = "/Admin/Dashboard";
                     } else {
                         window.location.href = "/Shop/Index";
-                    }                });
+                    }
+                });
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -87,19 +109,35 @@
     }
 
     $scope.userRegister = function () {
-        // Validation
-        if (!$scope.userRegisterData.fullName || !$scope.userRegisterData.username ||
-            !$scope.userRegisterData.email || !$scope.userRegisterData.password) {
+        // Check form validity
+        if ($scope.registerForm.$invalid) {
+            // Mark all fields as touched
+            angular.forEach($scope.registerForm.$error, function (field) {
+                angular.forEach(field, function (errorField) {
+                    errorField.$setTouched();
+                });
+            });
+
             Swal.fire({
                 icon: 'warning',
-                title: 'Required Fields',
-                text: 'Please fill in all required fields'
+                title: 'Validation Error',
+                text: 'Please fill in all required fields correctly'
             });
             return;
         }
 
-        // Check if passwords match
-        if ($scope.userRegisterData.password !== $scope.userRegisterData.confirmPassword) {
+        // Sanitize inputs
+        var userData = {
+            fullName: $scope.userRegisterData.fullName.trim(),
+            username: $scope.userRegisterData.username.trim().toLowerCase(),
+            email: $scope.userRegisterData.email.trim().toLowerCase(),
+            phoneNumber: $scope.userRegisterData.phoneNumber.trim(),
+            address: $scope.userRegisterData.address.trim(),
+            password: $scope.userRegisterData.password
+        };
+
+        // Additional validation
+        if (userData.password !== $scope.userRegisterData.confirmPassword) {
             Swal.fire({
                 icon: 'error',
                 title: 'Password Mismatch',
@@ -108,7 +146,6 @@
             return;
         }
 
-        // Check if terms are accepted
         if (!$scope.userRegisterData.acceptTerms) {
             Swal.fire({
                 icon: 'warning',
@@ -118,7 +155,7 @@
             return;
         }
 
-        var registerRequest = ProteinWebApplicationService.registerUser($scope.userRegisterData);
+        var registerRequest = ProteinWebApplicationService.registerUser(userData);
         registerRequest.then(function (response) {
             if (response.data.success) {
                 Swal.fire({
@@ -1395,8 +1432,8 @@
         }
     };
 
-    // Process checkout
     $scope.processCheckout = function () {
+        // Check if user is logged in
         if (!$scope.isUserLoggedIn) {
             Swal.fire({
                 icon: 'info',
@@ -1413,6 +1450,7 @@
             return;
         }
 
+        // Check if cart is empty
         if ($scope.cart.length === 0) {
             Swal.fire({
                 icon: 'warning',
@@ -1422,23 +1460,29 @@
             return;
         }
 
-        // Validate form
-        if (!$scope.checkoutForm.customerName || !$scope.checkoutForm.customerEmail ||
-            !$scope.checkoutForm.customerPhone || !$scope.checkoutForm.shippingAddress) {
+        // Check form validity
+        if ($scope.checkoutForm.$invalid) {
+            // Mark all fields as touched
+            angular.forEach($scope.checkoutForm.$error, function (field) {
+                angular.forEach(field, function (errorField) {
+                    errorField.$setTouched();
+                });
+            });
+
             Swal.fire({
                 icon: 'warning',
-                title: 'Required Fields',
-                text: 'Please fill in all required fields'
+                title: 'Validation Error',
+                text: 'Please fill in all required fields correctly'
             });
             return;
         }
 
-        // Prepare order data
+        // Sanitize and prepare data
         var checkoutData = {
-            customerName: $scope.checkoutForm.customerName,
-            customerEmail: $scope.checkoutForm.customerEmail,
-            customerPhone: $scope.checkoutForm.customerPhone,
-            shippingAddress: $scope.checkoutForm.shippingAddress,
+            customerName: $scope.checkoutForm.customerName.trim(),
+            customerEmail: $scope.checkoutForm.customerEmail.trim().toLowerCase(),
+            customerPhone: $scope.checkoutForm.customerPhone.trim(),
+            shippingAddress: $scope.checkoutForm.shippingAddress.trim(),
             totalAmount: $scope.getCartTotal(),
             orderItems: $scope.cart.map(function (item) {
                 return {

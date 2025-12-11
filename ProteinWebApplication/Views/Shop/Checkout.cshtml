@@ -23,67 +23,98 @@
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6">Shipping Information</h2>
 
-                        <form ng-submit="processCheckout()" name="checkoutFormValidation">
+                        <form ng-submit="processCheckout()" name="checkoutForm" novalidate>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
+                                    <label class="block text-gray-700 font-medium mb-2">
+                                        Full Name <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="text"
+                                           name="customerName"
                                            ng-model="checkoutForm.customerName"
                                            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                           required>
+                                           ng-class="{'border-red-500': checkoutForm.customerName.$invalid && checkoutForm.customerName.$touched}"
+                                           placeholder="Juan Dela Cruz"
+                                           required
+                                           minlength="2"
+                                           maxlength="100"
+                                           ng-pattern="/^[a-zA-Z\s]+$/">
+                                    <div class="mt-1 text-xs text-red-600" ng-show="checkoutForm.customerName.$touched">
+                                        <p ng-show="checkoutForm.customerName.$error.required">Full name is required</p>
+                                        <p ng-show="checkoutForm.customerName.$error.minlength">Name must be at least 2 characters</p>
+                                        <p ng-show="checkoutForm.customerName.$error.pattern">Name can only contain letters and spaces</p>
+                                    </div>
                                 </div>
+
                                 <div>
-                                    <label class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                                    <label class="block text-gray-700 font-medium mb-2">
+                                        Email Address <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="email"
+                                           name="customerEmail"
                                            ng-model="checkoutForm.customerEmail"
                                            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           ng-class="{'border-red-500': checkoutForm.customerEmail.$invalid && checkoutForm.customerEmail.$touched}"
+                                           placeholder="juan@example.com"
                                            required>
+                                    <div class="mt-1 text-xs text-red-600" ng-show="checkoutForm.customerEmail.$touched">
+                                        <p ng-show="checkoutForm.customerEmail.$error.required">Email is required</p>
+                                        <p ng-show="checkoutForm.customerEmail.$error.email">Please enter a valid email address</p>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="mb-6">
-                                <label class="block text-gray-700 font-medium mb-2">Phone Number *</label>
+                                <label class="block text-gray-700 font-medium mb-2">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
                                 <input type="tel"
+                                       name="customerPhone"
                                        ng-model="checkoutForm.customerPhone"
-                                       placeholder="09XX-XXX-XXXX"
                                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       required>
+                                       ng-class="{'border-red-500': checkoutForm.customerPhone.$invalid && checkoutForm.customerPhone.$touched}"
+                                       placeholder="09XX-XXX-XXXX"
+                                       required
+                                       ng-pattern="/^(09|\+639)\d{9}$/">
+                                <div class="mt-1 text-xs text-red-600" ng-show="checkoutForm.customerPhone.$touched">
+                                    <p ng-show="checkoutForm.customerPhone.$error.required">Phone number is required</p>
+                                    <p ng-show="checkoutForm.customerPhone.$error.pattern">Enter valid PH mobile (09XXXXXXXXX)</p>
+                                </div>
                             </div>
 
                             <div class="mb-6">
-                                <label class="block text-gray-700 font-medium mb-2">Shipping Address *</label>
-                                <textarea ng-model="checkoutForm.shippingAddress"
-                                          rows="3"
-                                          placeholder="Enter your complete shipping address"
+                                <label class="block text-gray-700 font-medium mb-2">
+                                    Shipping Address <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="shippingAddress"
+                                          ng-model="checkoutForm.shippingAddress"
                                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                          required></textarea>
+                                          ng-class="{'border-red-500': checkoutForm.shippingAddress.$invalid && checkoutForm.shippingAddress.$touched}"
+                                          placeholder="Enter your complete shipping address (House/Unit No., Street, Barangay, City, Province)"
+                                          rows="3"
+                                          required
+                                          minlength="20"
+                                          maxlength="255"></textarea>
+                                <div class="mt-1 text-xs text-red-600" ng-show="checkoutForm.shippingAddress.$touched">
+                                    <p ng-show="checkoutForm.shippingAddress.$error.required">Shipping address is required</p>
+                                    <p ng-show="checkoutForm.shippingAddress.$error.minlength">Please provide a complete address (at least 20 characters)</p>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">Please include: House/Unit No., Street, Barangay, City, Province, Postal Code</p>
                             </div>
 
                             <div class="mb-6">
                                 <label class="block text-gray-700 font-medium mb-2">Order Notes (Optional)</label>
-                                <textarea ng-model="checkoutForm.orderNotes"
+                                <textarea name="orderNotes"
+                                          ng-model="checkoutForm.orderNotes"
+                                          class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Any special instructions for your order (e.g., delivery time preferences, landmarks)"
                                           rows="2"
-                                          placeholder="Any special instructions for your order"
-                                          class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                            </div>
-
-                            <!-- Payment Method -->
-                            <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 class="font-bold text-gray-800 mb-3 flex items-center">
-                                    <i class="fas fa-money-bill-wave mr-2 text-blue-600"></i>
-                                    Payment Method
-                                </h3>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="radio" name="payment" value="cod" checked class="mr-3">
-                                        <span class="text-gray-700">Cash on Delivery (COD)</span>
-                                    </label>
-                                    <p class="text-sm text-gray-600 ml-8">Pay when you receive your order</p>
-                                </div>
+                                          maxlength="500"></textarea>
+                                <p class="mt-1 text-xs text-gray-500">{{checkoutForm.orderNotes.length || 0}}/500 characters</p>
                             </div>
 
                             <button type="submit"
-                                    ng-disabled="cart.length === 0"
+                                    ng-disabled="checkoutForm.$invalid || cart.length === 0"
                                     class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
                                 <i class="fas fa-check-circle mr-2"></i>Place Order
                             </button>
