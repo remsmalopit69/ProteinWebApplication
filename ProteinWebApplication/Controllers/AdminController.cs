@@ -403,8 +403,9 @@ namespace ProteinWebApplication.Controllers
             }
         }
 
+        // Replace the ArchiveImage method in AdminController.cs with this fixed version:
+
         [HttpPost]
-        [HttpGet]
         public JsonResult ArchiveImage(int imageID)
         {
             if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
@@ -477,6 +478,86 @@ namespace ProteinWebApplication.Controllers
 
                     db.SaveChanges();
                     return Json(new { success = true, message = "Image set as active" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Add this method to AdminController.cs after the GetImages method
+
+        public JsonResult GetArchivedImages()
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var images = db.tbl_images
+                        .Where(x => x.isArchive == 1)
+                        .OrderByDescending(x => x.updatedAt)
+                        .Select(i => new
+                        {
+                            i.imageID,
+                            i.imageName,
+                            i.imagePath,
+                            i.imageType,
+                            i.referenceID,
+                            i.createdAt,
+                            i.updatedAt,
+                            isAssigned = i.referenceID != null
+                        })
+                        .ToList();
+                    return Json(images, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"An error occurred: {ex.Message}");
+            }
+        }
+
+        // Add this method to restore archived images
+        public JsonResult RestoreImage(int imageID)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var image = db.tbl_images
+                        .Where(x => x.imageID == imageID)
+                        .FirstOrDefault();
+
+                    if (image != null)
+                    {
+                        image.isArchive = 0;
+                        image.updatedAt = DateTime.Now;
+                        db.SaveChanges();
+
+                        var archivedImages = db.tbl_images
+                            .Where(x => x.isArchive == 1)
+                            .OrderByDescending(x => x.updatedAt)
+                            .Select(i => new
+                            {
+                                i.imageID,
+                                i.imageName,
+                                i.imagePath,
+                                i.imageType,
+                                i.referenceID,
+                                i.createdAt,
+                                i.updatedAt,
+                                isAssigned = i.referenceID != null
+                            })
+                            .ToList();
+
+                        return Json(new { success = true, data = archivedImages, message = "Image restored successfully" }, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new { success = false, message = "Image not found" }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)

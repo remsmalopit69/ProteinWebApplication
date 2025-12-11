@@ -269,4 +269,23 @@
             params: { imageType: imageType }
         });
     }
+
+    // Add these methods to Service.js in the ProteinWebApplicationService
+
+    // Get archived images
+    this.getArchivedImages = function () {
+        return $http.get("/Admin/GetArchivedImages");
+    }
+
+    // Restore archived image
+    this.restoreImage = function (imageID) {
+        var response = $http({
+            method: "post",
+            url: "/Admin/RestoreImage",
+            params: {
+                imageID: imageID
+            }
+        });
+        return response;
+    }
 });

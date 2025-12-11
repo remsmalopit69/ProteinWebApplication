@@ -402,6 +402,8 @@
         });
     }
 
+    // Replace the deleteImage function in Controller.js with this:
+
     $scope.deleteImage = function (imageID) {
         Swal.fire({
             title: 'Archive Image?',
@@ -415,16 +417,96 @@
             if (result.isConfirmed) {
                 var archiveImage = ProteinWebApplicationService.archiveImage(imageID);
                 archiveImage.then(function (response) {
+                    console.log('Archive response:', response.data); // Debug log
                     if (response.data.success) {
                         $scope.images = response.data.data;
                         Swal.fire({
                             icon: 'success',
                             title: 'Archived!',
-                            text: 'Image archived successfully',
+                            text: response.data.message || 'Image archived successfully',
                             timer: 1500,
                             showConfirmButton: false
                         });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.data.message || 'Failed to archive image'
+                        });
                     }
+                }, function (error) {
+                    console.error('Archive error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while archiving the image'
+                    });
+                });
+            }
+        });
+    }
+
+    // Add these functions to Controller.js in the ProteinWebApplicationController
+
+    // Initialize archived images array
+    $scope.archivedImages = [];
+    $scope.showArchived = false;
+
+    // Load archived images
+    $scope.loadArchivedImages = function () {
+        var getArchivedImages = ProteinWebApplicationService.getArchivedImages();
+        getArchivedImages.then(function (response) {
+            $scope.archivedImages = response.data;
+        });
+    }
+
+    // Toggle between active and archived images view
+    $scope.toggleArchivedView = function () {
+        $scope.showArchived = !$scope.showArchived;
+        if ($scope.showArchived) {
+            $scope.loadArchivedImages();
+        } else {
+            $scope.loadImages();
+        }
+    }
+
+    // Restore archived image
+    $scope.restoreImage = function (imageID) {
+        Swal.fire({
+            title: 'Restore Image?',
+            text: 'This image will be restored to active images',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, restore it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var restoreImage = ProteinWebApplicationService.restoreImage(imageID);
+                restoreImage.then(function (response) {
+                    if (response.data.success) {
+                        $scope.archivedImages = response.data.data;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Restored!',
+                            text: response.data.message || 'Image restored successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.data.message || 'Failed to restore image'
+                        });
+                    }
+                }, function (error) {
+                    console.error('Restore error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while restoring the image'
+                    });
                 });
             }
         });

@@ -7,12 +7,25 @@
 
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Images Library</h2>
-        <button data-bs-toggle="modal"
-                data-bs-target="#imageModal"
-                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-            <i class="fas fa-plus mr-2"></i>Upload Image
-        </button>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Images Library</h2>
+            <p class="text-sm text-gray-600 mt-1" ng-if="!showArchived">Active images in your library</p>
+            <p class="text-sm text-gray-600 mt-1" ng-if="showArchived">Archived images</p>
+        </div>
+        <div class="flex gap-3">
+            <button ng-click="toggleArchivedView()"
+                    class="px-4 py-2 rounded transition"
+                    ng-class="showArchived ? 'bg-gray-500 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
+                <i class="mr-2" ng-class="showArchived ? 'fas fa-eye' : 'fas fa-archive'"></i>
+                {{showArchived ? 'View Active Images' : 'View Archived'}}
+            </button>
+            <button ng-if="!showArchived"
+                    data-bs-toggle="modal"
+                    data-bs-target="#imageModal"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                <i class="fas fa-plus mr-2"></i>Upload Image
+            </button>
+        </div>
     </div>
 
     <!-- Filter by Type -->
@@ -47,10 +60,15 @@
                 class="px-4 py-2 rounded hover:bg-blue-600 transition">
             Features
         </button>
+        <button ng-click="filterImageType = 'about'"
+                ng-class="{'bg-blue-500 text-white': filterImageType === 'about', 'bg-gray-200 text-gray-700': filterImageType !== 'about'}"
+                class="px-4 py-2 rounded hover:bg-blue-600 transition">
+            About
+        </button>
     </div>
 
-    <!-- Images Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <!-- Active Images Grid -->
+    <div ng-if="!showArchived" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div ng-repeat="image in images | filter:{imageType: filterImageType}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
             <div class="relative">
                 <img ng-src="{{image.imagePath}}" alt="{{image.imageName}}" class="w-full h-48 object-cover">
@@ -83,11 +101,54 @@
         </div>
     </div>
 
+    <!-- Archived Images Grid -->
+    <div ng-if="showArchived" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div ng-repeat="image in archivedImages | filter:{imageType: filterImageType}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition border-2 border-gray-300">
+            <div class="relative">
+                <img ng-src="{{image.imagePath}}" alt="{{image.imageName}}" class="w-full h-48 object-cover opacity-75">
+                <span class="absolute top-2 left-2 bg-gray-700 text-white text-xs px-2 py-1 rounded">
+                    <i class="fas fa-archive mr-1"></i>Archived
+                </span>
+                <span ng-if="image.isAssigned" class="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                    Was Assigned
+                </span>
+            </div>
+            <div class="p-4">
+                <h4 class="font-semibold text-gray-800 mb-2 truncate">{{image.imageName}}</h4>
+                <p class="text-sm text-gray-600 mb-3">
+                    <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+                        {{image.imageType}}
+                    </span>
+                </p>
+                <div class="text-xs text-gray-500 mb-1">
+                    Uploaded: {{image.createdAt | date:'MM/dd/yyyy'}}
+                </div>
+                <div class="text-xs text-gray-500 mb-3">
+                    Archived: {{image.updatedAt | date:'MM/dd/yyyy'}}
+                </div>
+                <div class="flex gap-2">
+                    <button ng-click="restoreImage(image.imageID)"
+                            class="flex-1 bg-green-500 text-white text-xs px-3 py-2 rounded hover:bg-green-600 transition">
+                        <i class="fas fa-undo mr-1"></i>Restore
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- No Images Message -->
-    <div ng-if="(images | filter:{imageType: filterImageType}).length === 0" class="text-center py-16 bg-gray-50 rounded-lg">
+    <div ng-if="!showArchived && (images | filter:{imageType: filterImageType}).length === 0" class="text-center py-16 bg-gray-50 rounded-lg">
         <i class="fas fa-images text-gray-300 text-6xl mb-4"></i>
         <h3 class="text-xl font-bold text-gray-600 mb-2">No images found</h3>
         <p class="text-gray-500">Upload some images to get started</p>
+    </div>
+
+    <!-- No Archived Images Message -->
+    <div ng-if="showArchived && (archivedImages | filter:{imageType: filterImageType}).length === 0" class="text-center py-16 bg-gray-50 rounded-lg">
+        <i class="fas fa-archive text-gray-300 text-6xl mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-600 mb-2">No archived images found</h3>
+        <p class="text-gray-500" ng-if="filterImageType">No archived images in the {{filterImageType}} category</p>
+        <p class="text-gray-500" ng-if="!filterImageType">Archived images will appear here</p>
     </div>
 
     <!-- Upload Image Modal -->
