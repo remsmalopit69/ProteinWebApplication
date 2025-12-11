@@ -103,6 +103,7 @@ namespace ProteinWebApplication.Controllers
             }
         }
 
+        // IMPROVED: Add Category - return the new category ID
         public JsonResult AddCategory(tblCategoriesModel category)
         {
             if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
@@ -117,8 +118,12 @@ namespace ProteinWebApplication.Controllers
                     db.tbl_categories.Add(category);
                     db.SaveChanges();
 
-                    var categories = db.tbl_categories.Where(x => x.isArchive == 0).ToList();
-                    return Json(new { success = true, data = categories }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        success = true,
+                        categoryID = category.categoryID,
+                        message = "Category added successfully"
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
@@ -224,8 +229,12 @@ namespace ProteinWebApplication.Controllers
                     db.tbl_products.Add(product);
                     db.SaveChanges();
 
-                    var products = db.tbl_products.Where(x => x.isArchive == 0).ToList();
-                    return Json(new { success = true, data = products }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        success = true,
+                        productID = product.productID,
+                        message = "Product added successfully"
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
@@ -354,6 +363,7 @@ namespace ProteinWebApplication.Controllers
             }
         }
 
+        // IMPROVED: Upload image and return the uploaded image info
         [HttpPost]
         public JsonResult UploadImage(HttpPostedFileBase imageFile, string imageType, int? referenceID)
         {
@@ -383,7 +393,7 @@ namespace ProteinWebApplication.Controllers
                             imagePath = "/Content/Images/" + uniqueFileName,
                             imageType = imageType,
                             referenceID = referenceID,
-                            displayOrder = 0, // Not used anymore but keep for compatibility
+                            displayOrder = 0,
                             createdAt = DateTime.Now,
                             updatedAt = DateTime.Now,
                             isArchive = 0
@@ -391,8 +401,18 @@ namespace ProteinWebApplication.Controllers
                         db.tbl_images.Add(image);
                         db.SaveChanges();
 
-                        var images = db.tbl_images.Where(x => x.isArchive == 0).ToList();
-                        return Json(new { success = true, data = images }, JsonRequestBehavior.AllowGet);
+                        // Return the uploaded image info
+                        return Json(new
+                        {
+                            success = true,
+                            uploadedImage = new
+                            {
+                                imageID = image.imageID,
+                                imageName = image.imageName,
+                                imagePath = image.imagePath,
+                                imageType = image.imageType
+                            }
+                        }, JsonRequestBehavior.AllowGet);
                     }
                 }
                 return Json(new { success = false, message = "No file uploaded" }, JsonRequestBehavior.AllowGet);
@@ -565,6 +585,73 @@ namespace ProteinWebApplication.Controllers
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        // Add these improved methods to your AdminController.cs
+
+
+
+        // NEW: Get images assigned to a specific product
+        public JsonResult GetProductImages(int productID)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var images = db.tbl_images
+                        .Where(x => x.referenceID == productID && x.imageType == "product" && x.isArchive == 0)
+                        .Select(i => new
+                        {
+                            i.imageID,
+                            i.imageName,
+                            i.imagePath,
+                            i.imageType,
+                            i.referenceID
+                        })
+                        .ToList();
+                    return Json(images, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // NEW: Get images assigned to a specific category
+        public JsonResult GetCategoryImages(int categoryID)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new ProteinContext())
+                {
+                    var images = db.tbl_images
+                        .Where(x => x.referenceID == categoryID && x.imageType == "category" && x.isArchive == 0)
+                        .Select(i => new
+                        {
+                            i.imageID,
+                            i.imageName,
+                            i.imagePath,
+                            i.imageType,
+                            i.referenceID
+                        })
+                        .ToList();
+                    return Json(images, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // IMPROVED: Add Product - return the new product ID
+
+
+
 
         // ==================== ORDERS CRUD ====================
         public JsonResult GetOrders()

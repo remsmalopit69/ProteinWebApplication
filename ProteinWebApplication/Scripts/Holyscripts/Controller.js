@@ -848,4 +848,305 @@
             }
         });
     }
+
+    // Add these improved functions to your Controller.js
+
+    // ==================== IMPROVED PRODUCTS WITH IMAGE MANAGEMENT ====================
+
+    $scope.openProductModal = function (product) {
+        if (product) {
+            $scope.editMode = true;
+            $scope.productForm = angular.copy(product);
+
+            // Load the current product image if it exists
+            if (product.productID) {
+                var getProductImages = ProteinWebApplicationService.getProductImages(product.productID);
+                getProductImages.then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.productForm.selectedImage = response.data[0].imagePath;
+                        $scope.productForm.selectedImageID = response.data[0].imageID;
+                    }
+                });
+            }
+        } else {
+            $scope.editMode = false;
+            $scope.productForm = {
+                selectedImage: null,
+                selectedImageID: null
+            };
+        }
+
+        // Load available unassigned images
+        $scope.loadImagesByType('product');
+    }
+
+    // Select image from gallery
+    $scope.selectImageForProduct = function (image) {
+        $scope.productForm.selectedImage = image.imagePath;
+        $scope.productForm.selectedImageID = image.imageID;
+    }
+
+    // Upload new image for product
+    $scope.uploadProductImage = function (file) {
+        if (!file) return;
+
+        // Show loading
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while we upload your image',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        var formData = new FormData();
+        formData.append('imageFile', file);
+        formData.append('imageType', 'product');
+
+        fetch('/Admin/UploadImage', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.uploadedImage) {
+                    $scope.$apply(function () {
+                        $scope.productForm.selectedImage = data.uploadedImage.imagePath;
+                        $scope.productForm.selectedImageID = data.uploadedImage.imageID;
+                        $scope.loadImagesByType('product');
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Uploaded!',
+                        text: 'Image uploaded successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Upload failed'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while uploading'
+                });
+            });
+    }
+
+    // Updated save product with image assignment
+    $scope.saveProduct = function () {
+        if (!$scope.productForm.productName || !$scope.productForm.price) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required Fields',
+                text: 'Product name and price are required'
+            });
+            return;
+        }
+
+        var savePromise;
+
+        if ($scope.editMode) {
+            savePromise = ProteinWebApplicationService.updateProduct($scope.productForm);
+        } else {
+            savePromise = ProteinWebApplicationService.addProduct($scope.productForm);
+        }
+
+        savePromise.then(function (response) {
+            if (response.data.success) {
+                var savedProductID = response.data.productID || $scope.productForm.productID;
+
+                // If an image was selected, assign it to the product
+                if ($scope.productForm.selectedImageID && savedProductID) {
+                    var assignImage = ProteinWebApplicationService.assignImageToProduct(
+                        savedProductID,
+                        $scope.productForm.selectedImageID
+                    );
+
+                    assignImage.then(function (imgResponse) {
+                        $scope.loadProducts();
+                        Swal.fire({
+                            icon: 'success',
+                            title: $scope.editMode ? 'Updated!' : 'Added!',
+                            text: 'Product saved with image successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    });
+                } else {
+                    $scope.loadProducts();
+                    Swal.fire({
+                        icon: 'success',
+                        title: $scope.editMode ? 'Updated!' : 'Added!',
+                        text: 'Product saved successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+
+                $scope.productForm = {};
+            }
+        });
+    }
+
+    // ==================== IMPROVED CATEGORIES WITH IMAGE MANAGEMENT ====================
+
+    $scope.openCategoryModal = function (category) {
+        if (category) {
+            $scope.editMode = true;
+            $scope.categoryForm = angular.copy(category);
+
+            // Load the current category image if it exists
+            if (category.categoryID) {
+                var getCategoryImages = ProteinWebApplicationService.getCategoryImages(category.categoryID);
+                getCategoryImages.then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.categoryForm.selectedImage = response.data[0].imagePath;
+                        $scope.categoryForm.selectedImageID = response.data[0].imageID;
+                    }
+                });
+            }
+        } else {
+            $scope.editMode = false;
+            $scope.categoryForm = {
+                selectedImage: null,
+                selectedImageID: null
+            };
+        }
+
+        // Load available unassigned images for categories
+        $scope.loadCategoryImages();
+    }
+
+    // Load images for category selection
+    $scope.loadCategoryImages = function () {
+        var getImages = ProteinWebApplicationService.getImagesByType('category');
+        getImages.then(function (response) {
+            $scope.availableCategoryImages = response.data;
+        });
+    }
+
+    // Select image from gallery for category
+    $scope.selectImageForCategory = function (image) {
+        $scope.categoryForm.selectedImage = image.imagePath;
+        $scope.categoryForm.selectedImageID = image.imageID;
+    }
+
+    // Upload new image for category
+    $scope.uploadCategoryImage = function (file) {
+        if (!file) return;
+
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while we upload your image',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        var formData = new FormData();
+        formData.append('imageFile', file);
+        formData.append('imageType', 'category');
+
+        fetch('/Admin/UploadImage', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.uploadedImage) {
+                    $scope.$apply(function () {
+                        $scope.categoryForm.selectedImage = data.uploadedImage.imagePath;
+                        $scope.categoryForm.selectedImageID = data.uploadedImage.imageID;
+                        $scope.loadCategoryImages();
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Uploaded!',
+                        text: 'Image uploaded successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Upload failed'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while uploading'
+                });
+            });
+    }
+
+    // Updated save category with image assignment
+    $scope.saveCategory = function () {
+        if (!$scope.categoryForm.categoryName) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Required Field',
+                text: 'Category name is required'
+            });
+            return;
+        }
+
+        var savePromise;
+
+        if ($scope.editMode) {
+            savePromise = ProteinWebApplicationService.updateCategory($scope.categoryForm);
+        } else {
+            savePromise = ProteinWebApplicationService.addCategory($scope.categoryForm);
+        }
+
+        savePromise.then(function (response) {
+            if (response.data.success) {
+                var savedCategoryID = response.data.categoryID || $scope.categoryForm.categoryID;
+
+                // If an image was selected, assign it to the category
+                if ($scope.categoryForm.selectedImageID && savedCategoryID) {
+                    var assignImage = ProteinWebApplicationService.assignImageToCategory(
+                        savedCategoryID,
+                        $scope.categoryForm.selectedImageID
+                    );
+
+                    assignImage.then(function (imgResponse) {
+                        $scope.loadCategories();
+                        Swal.fire({
+                            icon: 'success',
+                            title: $scope.editMode ? 'Updated!' : 'Added!',
+                            text: 'Category saved with image successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    });
+                } else {
+                    $scope.loadCategories();
+                    Swal.fire({
+                        icon: 'success',
+                        title: $scope.editMode ? 'Updated!' : 'Added!',
+                        text: 'Category saved successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+
+                $scope.categoryForm = {};
+            }
+        });
+    }
 });

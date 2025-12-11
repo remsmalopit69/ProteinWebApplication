@@ -288,4 +288,20 @@
         });
         return response;
     }
+
+    // Add these new methods to your Service.js
+
+    // Get images for a specific product
+    this.getProductImages = function (productID) {
+        return $http.get("/Admin/GetProductImages", {
+            params: { productID: productID }
+        });
+    }
+
+    // Get images for a specific category
+    this.getCategoryImages = function (categoryID) {
+        return $http.get("/Admin/GetCategoryImages", {
+            params: { categoryID: categoryID }
+        });
+    }
 });
