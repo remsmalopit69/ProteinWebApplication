@@ -304,4 +304,25 @@
             params: { categoryID: categoryID }
         });
     }
+    // Add these methods to your Service.js in the ProteinWebApplicationService
+
+    // ==================== CHECKOUT ====================
+    this.processCheckout = function (checkoutData) {
+        var response = $http({
+            method: "post",
+            url: "/Checkout/ProcessCheckout",
+            data: checkoutData
+        });
+        return response;
+    }
+
+    this.getMyOrders = function () {
+        return $http.get("/Checkout/GetMyOrders");
+    }
+
+    this.getOrderDetails = function (orderID) {
+        return $http.get("/Checkout/GetOrderDetails", {
+            params: { orderID: orderID }
+        });
+    }
 });

@@ -80,9 +80,27 @@
                         </div>
                     </div>
 
-                    <!-- Add to Cart Button -->
+                    <div class="flex items-center space-x-4 mb-6" ng-init="productQuantity = 1">
+                        <button ng-click="productQuantity = productQuantity - 1"
+                                ng-disabled="productQuantity <= 1"
+                                class="bg-gray-200 text-gray-800 w-10 h-10 rounded-lg hover:bg-gray-300 transition font-bold">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number"
+                               ng-model="productQuantity"
+                               min="1"
+                               max="{{productDetails.stockQuantity}}"
+                               class="w-20 text-center border-2 border-gray-300 rounded-lg py-2 font-semibold">
+                        <button ng-click="productQuantity = productQuantity + 1"
+                                ng-disabled="productQuantity >= productDetails.stockQuantity"
+                                class="bg-gray-200 text-gray-800 w-10 h-10 rounded-lg hover:bg-gray-300 transition font-bold">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
                     <div class="flex gap-4">
-                        <button ng-disabled="productDetails.stockQuantity === 0"
+                        <button ng-click="addToCart(productDetails, productQuantity)"
+                                ng-disabled="productDetails.stockQuantity === 0"
                                 class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
                             <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                         </button>

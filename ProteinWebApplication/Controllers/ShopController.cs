@@ -29,6 +29,11 @@ namespace ProteinWebApplication.Controllers
             return View();
         }
 
+        public ActionResult Cart()
+        {
+            return View();
+        }
+
         public ActionResult ProductDetails(int id)
         {
             ViewBag.ProductID = id;

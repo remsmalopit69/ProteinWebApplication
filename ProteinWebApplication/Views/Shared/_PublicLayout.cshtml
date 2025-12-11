@@ -106,10 +106,13 @@
                         </a>
                     </div>
 
-                    <button class="relative hover:text-black transition">
+                    <a href="/Shop/Cart" class="relative hover:text-black transition">
                         <i class="fas fa-shopping-cart text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
-                    </button>
+                        <span ng-if="getCartCount() > 0"
+                              class="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            {{getCartCount()}}
+                        </span>
+                    </a>
 
                     <button ng-click="toggleMobileMenu()" class="lg:hidden text-gray-700 hover:text-black">
                         <i class="fas fa-bars text-xl"></i>

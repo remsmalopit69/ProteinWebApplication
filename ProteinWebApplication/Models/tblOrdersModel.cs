@@ -17,5 +17,7 @@ namespace ProteinWebApplication.Models
         public DateTime createdAt { get; set; }
         public DateTime updatedAt { get; set; }
         public int isArchive { get; set; }
+        public string shippingAddress { get; set; }  // Add this field
+
     }
 }
