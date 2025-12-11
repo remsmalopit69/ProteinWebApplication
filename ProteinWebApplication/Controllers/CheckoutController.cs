@@ -32,12 +32,19 @@ namespace ProteinWebApplication.Controllers
             return View();
         }
 
-        public ActionResult Success(int orderID)
+        // FIXED: Make orderID nullable with default value
+        public ActionResult Success(int? orderID = null)
         {
             var authCheck = CheckUserAccess();
             if (authCheck != null) return authCheck;
 
-            ViewBag.OrderID = orderID;
+            // If no orderID provided, redirect to shop
+            if (!orderID.HasValue)
+            {
+                return RedirectToAction("Index", "Shop");
+            }
+
+            ViewBag.OrderID = orderID.Value;
             return View();
         }
 
